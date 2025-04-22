@@ -125,8 +125,7 @@
       <label><input type="checkbox" class="feature" value="合計小さめ"> 合計小さめ</label>
       <span class="info-icon" onclick="showPopup(event, '本数字の合計が60未満の構成です。')">ⓘ</span>
 
-      <label><input type="checkbox" class="feature" value="合計大きめ"> 合計大きめ</label><label><input type="checkbox" class="feature" value="キャリーあり"> キャリーあり</label><span class="info-icon" onclick="showPopup(event, 'キャリーオーバーが発生していた回です。')">ⓘ</span>
-      <span class="info-icon" onclick="showPopup(event, '本数字の合計が80以上の構成です。')">ⓘ</span>
+      <label><input type="checkbox" class="feature" value="合計大きめ"> 合計大きめ</label><span class="info-icon" onclick="showPopup(event, '6つの本数字の合計が 151超 の回です。')">ⓘ</span><label><input type="checkbox" class="feature" value="キャリーあり"> キャリーあり</label><span class="info-icon" onclick="showPopup(event, 'キャリーオーバーが発生していた回です。')">ⓘ</span>
     </div>
     <button onclick="filterResults()">🔍 検索</button>
   </div>
@@ -159,6 +158,8 @@
     }
 
     function formatYen(value) {
+  if (!value || isNaN(value)) return "-";
+
       const intVal = parseInt(value);
       if (isNaN(intVal)) return value;
       return intVal.toLocaleString() + "円";
