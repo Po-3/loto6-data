@@ -158,7 +158,7 @@
     }
 
     function formatYen(value) {
-  if (!value || isNaN(value)) return "-";
+  if (value === "" || value === null || value === undefined) return "0円"; if (isNaN(value)) return "-";
 
       const intVal = parseInt(value);
       if (isNaN(intVal)) return value;
