@@ -154,13 +154,7 @@
     async function loadData() {
       const res = await fetch("loto6_data_for_web_with_features_updated.json");
       data = await res.json();
-      
-    renderTable(data);
-    const resultCountDiv = document.getElementById("result-count");
-    if (resultCountDiv) {
-      resultCountDiv.textContent = `検索結果：${data.length}件`;
-    }
-    
+      renderTable(data);
     }
 
     function formatYen(value) {
