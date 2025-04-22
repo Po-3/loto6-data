@@ -156,7 +156,10 @@
       data = await res.json();
       
     renderTable(data);
-    document.getElementById("result-count").textContent = `検索結果：${data.length}件`;
+    const resultCountDiv = document.getElementById("result-count");
+    if (resultCountDiv) {
+      resultCountDiv.textContent = `検索結果：${data.length}件`;
+    }
     
     }
 
