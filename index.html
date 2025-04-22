@@ -153,7 +153,7 @@
     let data = [];
 
     async function loadData() {
-      const res = await fetch("loto6_data_for_web_with_features.json");
+      const res = await fetch("loto6_data_for_web_with_features_updated.json");
       data = await res.json();
       renderTable(data);
     }
@@ -168,7 +168,7 @@
       const tbody = document.querySelector("#resultTable tbody");
       tbody.innerHTML = "";
       filteredData.forEach(item => {
-        const nums = [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"]].join("・");
+        const nums = [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"], item["第6数字"]].join("・");
         const row = `
           <tr>
             <td>${item["開催回"]}</td><td>${item["日付"]}</td><td>${nums}</td><td>${item["BONUS数字"]}</td><td>${item["特徴"]}</td>
