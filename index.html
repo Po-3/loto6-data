@@ -136,7 +136,7 @@
         <tr>
           <th>開催回</th><th>日付</th><th>本数字</th><th>ボーナス</th><th>特徴</th>
           <th>1等賞金</th><th>1等口数</th><th>2等賞金</th><th>2等口数</th>
-          <th>3等賞金</th><th>3等口数</th><th>4等賞金</th><th>4等口数</th><th>5等賞金</th><th>5等口数</th><th>キャリーオーバー</th><th>5等賞金</th><th>5等口数</th><th>キャリーオーバー</th>
+          <th>3等賞金</th><th>3等口数</th><th>4等賞金</th><th>4等口数</th><th>5等賞金</th><th>5等口数</th><th>キャリーオーバー</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -178,6 +178,10 @@
             <td>${item["2等口数"]}</td><td title="${formatYen(item["3等賞金"])}">${formatYen(item["3等賞金"])}</td>
             <td>${item["3等口数"]}</td><td title="${formatYen(item["4等賞金"])}">${formatYen(item["4等賞金"])}</td>
             <td>${item["4等口数"]}</td>
+<td title="${formatYen(item["5等賞金"])}">${formatYen(item["5等賞金"])}</td>
+<td>${item["5等口数"] ? parseInt(item["5等口数"]).toLocaleString() : "–"}口</td>
+<td title="${formatYen(item["キャリーオーバー"])}">${formatYen(item["キャリーオーバー"])}</td>
+
           </tr>`;
         tbody.insertAdjacentHTML("beforeend", row);
       });
