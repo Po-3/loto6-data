@@ -135,6 +135,9 @@ td:first-child, th:first-child {
 <label>開催回 From: <input id="fromRound" min="1" type="number"/></label>
 <label>To: <input id="toRound" min="1" type="number"/></label>
 <label>開催日 From: <input id="fromDate" type="date"/></label>
+<label>含む数字: <input id="includeNumbers" placeholder="例: 3,17,28" style="margin-left: 4px;" type="text"/></label>
+<label>除く数字: <input id="excludeNumbers" placeholder="例: 1,12" style="margin-left: 4px;" type="text"/></label>
+
 <label>To: <input id="toDate" type="date"/></label>
 <div style="display: flex; flex-wrap: wrap; gap: 8px;">
 <label><input class="feature" type="checkbox" value="連番あり"/> 連番あり</label><span class="info-icon" onclick="showPopup(event, '連続した数字（例：24・25など）を含む構成です。')">ⓘ</span>
@@ -145,8 +148,6 @@ td:first-child, th:first-child {
 <label><input class="feature" type="checkbox" value="合計大きめ"/> 合計大きめ</label><span class="info-icon" onclick="showPopup(event, '6つの本数字の合計が151を超える回です。')">ⓘ</span>
 <label><input class="feature" type="checkbox" value="キャリーあり"/> キャリーあり</label><span class="info-icon" onclick="showPopup(event, 'キャリーオーバーが発生していた回です。')">ⓘ</span>
 </div>
-
-
 <p id="resultCount" style="margin-top: 10px; font-weight: bold;"></p>
 <button onclick="filterResults()" style="background-color: #ff8888; color: white; font-size: 16px; font-weight: bold; font-family: 'Helvetica Neue', sans-serif; border: none; border-radius: 12px; padding: 10px 24px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">🔍 検索</button><button onclick="resetFilters()" style="margin-left: 10px; background-color: #ff8888; color: white; font-size: 16px; font-weight: bold; font-family: 'Helvetica Neue', sans-serif; border: none; border-radius: 12px; padding: 10px 24px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">🔄 リセット</button></div>
 <div class="scroll-container" id="scrollContainer">
@@ -216,12 +217,20 @@ td:first-child, th:first-child {
     const toDate = document.getElementById("toDate").value;
     const checked = Array.from(document.querySelectorAll(".feature:checked")).map(el => el.value);
     const filtered = data.filter(item => {
+  const includeNumbers = document.getElementById("includeNumbers").value.split(",").map(s => s.trim()).filter(s => s !== "").map(Number);
+  const excludeNumbers = document.getElementById("excludeNumbers").value.split(",").map(s => s.trim()).filter(s => s !== "").map(Number);
+
       const round = parseInt(item["開催回"]);
       const date = item["日付"];
       const inRound = round >= fromRound && round <= toRound;
       const inDate = (!fromDate || date >= fromDate) && (!toDate || date <= toDate);
       const hasFeature = checked.length === 0 || checked.every(f => item["特徴"]?.includes(f));
-      return inRound && inDate && hasFeature;
+      
+    const nums = [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"], item["第6数字"]];
+    const includeMatch = includeNumbers.length === 0 || includeNumbers.every(n => nums.includes(n));
+    const excludeMatch = excludeNumbers.length === 0 || excludeNumbers.every(n => !nums.includes(n));
+    return inRound && inDate && hasFeature && includeMatch && excludeMatch;
+    
     });
     renderTable(filtered);
     document.getElementById("resultCount").textContent = `検索結果：${filtered.length} 件（条件：` +
