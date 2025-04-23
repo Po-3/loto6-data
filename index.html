@@ -274,6 +274,37 @@ td:first-child, th:first-child {
 
   }
 
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadData();
+
+  const headers = document.querySelectorAll("#resultTable th");
+  headers.forEach((header, index) => {
+    header.style.cursor = "pointer";
+    header.addEventListener("click", () => sortTable(index));
+  });
+});
+
+let sortDirection = {};
+
+function sortTable(columnIndex) {
+  const table = document.getElementById("resultTable");
+  const tbody = table.querySelector("tbody");
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+  const isAsc = !sortDirection[columnIndex];
+  sortDirection[columnIndex] = isAsc;
+
+  rows.sort((a, b) => {
+    const aText = a.children[columnIndex].textContent.trim().replace(/[^\d.-]/g, "");
+    const bText = b.children[columnIndex].textContent.trim().replace(/[^\d.-]/g, "");
+    const aVal = isNaN(aText) ? aText : parseFloat(aText);
+    const bVal = isNaN(bText) ? bText : parseFloat(bText);
+    return isAsc ? (aVal > bVal ? 1 : -1) : (aVal < bVal ? 1 : -1);
+  });
+
+  rows.forEach(row => tbody.appendChild(row));
+}
+
 </script>
 </body>
 </html>
