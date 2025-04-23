@@ -75,16 +75,14 @@
       z-index: 999;
     }
     @media screen and (max-width: 600px) {
-      .filters label {
+.filters label {
         display: block;
         margin-bottom: 8px;
       }
       table {
-        font-size: 13px;
+  font-size: 14px;
       }
-      td:nth-child(3),
-      td:nth-child(5) {
-        font-size: 13px;
+      td:nth-child(3), td:nth-child(5) { font-size: 14px; }
       }
     }
   
@@ -110,6 +108,13 @@
   align-items: center;
   gap: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+
+@media screen and (max-width: 768px) {
+  td:nth-child(5) {
+    font-size: 10px !important;
+  }
 }
 
 </style>
