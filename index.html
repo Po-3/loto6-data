@@ -135,8 +135,6 @@ td:first-child, th:first-child {
 <label>開催回 From: <input id="fromRound" min="1" type="number"/></label>
 <label>To: <input id="toRound" min="1" type="number"/></label>
 <label>開催日 From: <input id="fromDate" type="date"/></label>
-
-
 <label>To: <input id="toDate" type="date"/></label><label>含む数字: <input id="includeNumbers" placeholder="例: 3,17,28" style="margin-left: 4px;" type="text"/></label><label>除く数字: <input id="excludeNumbers" placeholder="例: 1,12" style="margin-left: 4px;" type="text"/></label>
 <div style="display: flex; flex-wrap: wrap; gap: 8px;">
 <label><input class="feature" type="checkbox" value="連番あり"/> 連番あり</label><span class="info-icon" onclick="showPopup(event, '連続した数字（例：24・25など）を含む構成です。')">ⓘ</span>
@@ -153,10 +151,10 @@ td:first-child, th:first-child {
 <table id="resultTable">
 <thead>
 <tr>
-<th>開催回</th><th>日付</th><th>本数字</th><th>ボーナス</th><th>特徴</th>
-<th>1等賞金</th><th>1等口数</th><th>2等賞金</th><th>2等口数</th>
-<th>3等賞金</th><th>3等口数</th><th>4等賞金</th><th>4等口数</th>
-<th>5等賞金</th><th>5等口数</th><th>キャリーオーバー</th>
+<th style="cursor: pointer;" title="クリックで並び替え">開催回 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">日付 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">本数字 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">ボーナス 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">特徴 🔽</th>
+<th style="cursor: pointer;" title="クリックで並び替え">1等賞金 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">1等口数 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">2等賞金 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">2等口数 🔽</th>
+<th style="cursor: pointer;" title="クリックで並び替え">3等賞金 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">3等口数 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">4等賞金 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">4等口数 🔽</th>
+<th style="cursor: pointer;" title="クリックで並び替え">5等賞金 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">5等口数 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">キャリーオーバー 🔽</th>
 </tr>
 </thead>
 <tbody></tbody>
