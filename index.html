@@ -216,24 +216,15 @@ td:first-child, th:first-child {
     const toDate = document.getElementById("toDate").value;
     const checked = Array.from(document.querySelectorAll(".feature:checked")).map(el => el.value);
     const filtered = data.filter(item => {
-  const includeNumbers = document.getElementById("includeNumbers").value.split(",").map(s => s.trim()).filter(s => s !== "").map(Number);
-  console.log("🔍 含む数字:", includeNumbers);
-  const excludeNumbers = document.getElementById("excludeNumbers").value.split(",").map(s => s.trim()).filter(s => s !== "").map(Number);
-  console.log("❌ 除く数字:", excludeNumbers);
-
-      const round = parseInt(item["開催回"]);
+  const includeNumbers = document.getElementById("includeNumbers").value.split(",").map(s => s.trim()).filter(s => s !== "").map(Number);const excludeNumbers = document.getElementById("excludeNumbers").value.split(",").map(s => s.trim()).filter(s => s !== "").map(Number);const round = parseInt(item["開催回"]);
       const date = item["日付"];
       const inRound = round >= fromRound && round <= toRound;
       const inDate = (!fromDate || date >= fromDate) && (!toDate || date <= toDate);
       const hasFeature = checked.length === 0 || checked.every(f => item["特徴"]?.includes(f));
       
-    const nums = [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"], item["第6数字"]].map(n => Number(n));
-    console.log("🎯 この回の数字:", nums);
-    const includeMatch = includeNumbers.length === 0 || includeNumbers.every(n => nums.includes(Number(n)));
+    const nums = [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"], item["第6数字"]].map(n => Number(n));const includeMatch = includeNumbers.length === 0 || includeNumbers.every(n => nums.includes(Number(n)));
     const excludeMatch = excludeNumbers.length === 0 || excludeNumbers.every(n => !nums.includes(Number(n)));
-    if (!includeMatch || !excludeMatch) {
-      console.log("🚫 除外された回:", item["開催回"], "理由:", { includeMatch, excludeMatch });
-    }
+    if (!includeMatch || !excludeMatch) {}
     return inRound && inDate && hasFeature && includeMatch && excludeMatch;
     
     });
