@@ -270,6 +270,9 @@ td:first-child, th:first-child {
     document.getElementById("fromDate").value = "";
     document.getElementById("toDate").value = "";
     document.querySelectorAll(".feature").forEach(cb => cb.checked = false);
+  document.getElementById("includeNumbers").value = "";
+  document.getElementById("excludeNumbers").value = "";
+
     document.getElementById("resultCount").textContent = "";
     renderTable(data);
 
