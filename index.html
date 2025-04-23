@@ -144,6 +144,7 @@
       <label><input type="checkbox" class="feature" value="キャリーあり"> キャリーあり</label><span class="info-icon" onclick="showPopup(event, 'キャリーオーバーが発生していた回です。')">ⓘ</span>
     </div>
     <button onclick="filterResults()">🔍 検索</button>
+<button onclick="resetFilters()" style="margin-left: 10px;">🔄 リセット</button>
 <p id="resultCount" style="margin-top: 10px; font-weight: bold;"></p>
   </div>
 
@@ -251,6 +252,17 @@
   document.addEventListener("DOMContentLoaded", () => {
     loadData();
   });
+
+  function resetFilters() {
+    document.getElementById("fromRound").value = "";
+    document.getElementById("toRound").value = "";
+    document.getElementById("fromDate").value = "";
+    document.getElementById("toDate").value = "";
+    document.querySelectorAll(".feature").forEach(cb => cb.checked = false);
+    document.getElementById("resultCount").textContent = "";
+    renderTable(data);
+  }
+
 </script>
 </body>
 
