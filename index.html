@@ -139,6 +139,7 @@
       <label><input type="checkbox" class="feature" value="キャリーあり"> キャリーあり</label><span class="info-icon" onclick="showPopup(event, 'キャリーオーバーが発生していた回です。')">ⓘ</span>
     </div>
     <button onclick="filterResults()">🔍 検索</button>
+<p id="resultCount" style="margin-top: 10px; font-weight: bold;"></p>
   </div>
 
   <div class="scroll-container" id="scrollContainer">
@@ -214,6 +215,7 @@
       return inRound && inDate && hasFeature;
     });
     renderTable(filtered);
+    document.getElementById("resultCount").textContent = `検索結果：${filtered.length} 件`;
   }
 
   function showPopup(event, text) {
