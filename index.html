@@ -121,6 +121,23 @@ td:first-child, th:first-child {
   z-index: 3;
 }
 
+
+/* スマホ時のチェックボックス折り返し対策 */
+.features-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-start;
+}
+.features-wrap label {
+  flex: 1 1 160px;
+  min-width: 140px;
+}
+@media screen and (max-width: 600px) {
+  .features-wrap label {
+    flex: 1 1 100%;
+  }
+}
 </style>
 </head>
 <body>
@@ -136,7 +153,7 @@ td:first-child, th:first-child {
 <label>To: <input id="toRound" min="1" type="number"/></label>
 <label>開催日 From: <input id="fromDate" type="date"/></label>
 <label>To: <input id="toDate" type="date"/></label>
-<div style="display: flex; flex-wrap: wrap; gap: 8px;">
+<div class="features-wrap">
 <label><input class="feature" type="checkbox" value="連番あり"/> 連番あり</label><span class="info-icon" onclick="showPopup(event, '連続した数字（例：24・25など）を含む構成です。')">ⓘ</span>
 <label><input class="feature" type="checkbox" value="奇数多め"/> 奇数多め</label><span class="info-icon" onclick="showPopup(event, '奇数が4個以上含まれる構成です。')">ⓘ</span>
 <label><input class="feature" type="checkbox" value="偶数多め"/> 偶数多め</label><span class="info-icon" onclick="showPopup(event, '偶数が4個以上含まれる構成です。')">ⓘ</span>
@@ -145,8 +162,6 @@ td:first-child, th:first-child {
 <label><input class="feature" type="checkbox" value="合計大きめ"/> 合計大きめ</label><span class="info-icon" onclick="showPopup(event, '6つの本数字の合計が151を超える回です。')">ⓘ</span>
 <label><input class="feature" type="checkbox" value="キャリーあり"/> キャリーあり</label><span class="info-icon" onclick="showPopup(event, 'キャリーオーバーが発生していた回です。')">ⓘ</span>
 </div>
-
-
 <p id="resultCount" style="margin-top: 10px; font-weight: bold;"></p>
 <button onclick="filterResults()" style="background-color: #ff8888; color: white; font-size: 16px; font-weight: bold; font-family: 'Helvetica Neue', sans-serif; border: none; border-radius: 12px; padding: 10px 24px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">🔍 検索</button><button onclick="resetFilters()" style="margin-left: 10px; background-color: #ff8888; color: white; font-size: 16px; font-weight: bold; font-family: 'Helvetica Neue', sans-serif; border: none; border-radius: 12px; padding: 10px 24px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">🔄 リセット</button></div>
 <div class="scroll-container" id="scrollContainer">
