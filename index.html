@@ -227,7 +227,7 @@ td:first-child, th:first-child {
       const inDate = (!fromDate || date >= fromDate) && (!toDate || date <= toDate);
       const hasFeature = checked.length === 0 || checked.every(f => item["特徴"]?.includes(f));
       
-    const nums = [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"], item["第6数字"]];
+    const nums = [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"], item["第6数字"]].map(n => Number(n));
     console.log("🎯 この回の数字:", nums);
     const includeMatch = includeNumbers.length === 0 || includeNumbers.every(n => nums.includes(Number(n)));
     const excludeMatch = excludeNumbers.length === 0 || excludeNumbers.every(n => !nums.includes(Number(n)));
