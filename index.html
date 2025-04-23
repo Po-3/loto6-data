@@ -129,6 +129,7 @@
   <button class="scroll-button" id="scrollBottomBtn" onclick="scrollTableToBottom()">⬇ 最下段へ</button>
   <div id="popupBox" class="popup"></div>
 
+
 <script>
   let data = [];
 
@@ -140,9 +141,13 @@
   }
 
   async function loadData() {
-    const res = await fetch("./loto6.json");
-    data = await res.json();
-    renderTable(data);
+    try {
+      const res = await fetch("./loto6.json");
+      data = await res.json();
+      renderTable(data);
+    } catch (e) {
+      console.error("データ読み込み失敗:", e);
+    }
   }
 
   function renderTable(filteredData) {
@@ -211,4 +216,5 @@
   });
 </script>
 </body>
+
 </html>
