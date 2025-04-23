@@ -121,6 +121,7 @@
 </head>
 <body>
   <h1>ロト6結果検索ツール</h1>
+<p id="lastUpdated" style="font-size: 13px; color: #666; margin-top: -12px; margin-bottom: 16px;"></p>
 
   <nav style="margin-bottom: 16px;">
     <a href="https://po-3.github.io/loto7-data/" style="margin-right: 12px;">🔗 ロト7</a>
@@ -182,6 +183,11 @@
       const res = await fetch("./loto6.json");
       data = await res.json();
       renderTable(data);
+
+      const dates = data.map(item => item["日付"]).sort();
+      const latest = dates[dates.length - 1];
+      document.getElementById("lastUpdated").textContent = `最終更新日：${latest}`;
+
     } catch (e) {
       console.error("データ読み込み失敗:", e);
     }
@@ -261,6 +267,11 @@
     document.querySelectorAll(".feature").forEach(cb => cb.checked = false);
     document.getElementById("resultCount").textContent = "";
     renderTable(data);
+
+      const dates = data.map(item => item["日付"]).sort();
+      const latest = dates[dates.length - 1];
+      document.getElementById("lastUpdated").textContent = `最終更新日：${latest}`;
+
   }
 
 </script>
