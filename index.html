@@ -135,6 +135,8 @@ td:first-child, th:first-child {
 <label>開催回 From: <input id="fromRound" min="1" type="number"/></label>
 <label>To: <input id="toRound" min="1" type="number"/></label>
 <label>開催日 From: <input id="fromDate" type="date"/></label>
+
+
 <label>To: <input id="toDate" type="date"/></label><label>含む数字: <input id="includeNumbers" placeholder="例: 3,17,28" style="margin-left: 4px;" type="text"/></label><label>除く数字: <input id="excludeNumbers" placeholder="例: 1,12" style="margin-left: 4px;" type="text"/></label>
 <div style="display: flex; flex-wrap: wrap; gap: 8px;">
 <label><input class="feature" type="checkbox" value="連番あり"/> 連番あり</label><span class="info-icon" onclick="showPopup(event, '連続した数字（例：24・25など）を含む構成です。')">ⓘ</span>
@@ -163,6 +165,162 @@ td:first-child, th:first-child {
 <button class="scroll-button" id="scrollTopBtn" onclick="scrollTableToTop()">⬆ 最上段へ</button>
 <button class="scroll-button" id="scrollBottomBtn" onclick="scrollTableToBottom()">⬇ 最下段へ</button>
 <div class="popup" id="popupBox"></div>
-<script>データ更新日：2025/4/24 ｜ツールVer：1.11.1</script>
+<script>
+  let data = [];
+
+  function formatYen(value) {
+    if (!value) return "0円";
+    if (isNaN(value)) return "-";
+    const intVal = parseInt(value);
+    return isNaN(intVal) ? value : intVal.toLocaleString() + "円";
+  }
+
+  async function loadData() {
+    try {
+      const res = await fetch("./loto6.json");
+      data = await res.json();
+      renderTable(data);
+
+      const dates = data.map(item => item["日付"]).sort();
+      const latest = dates[dates.length - 1];
+      document.getElementById("lastUpdated").innerHTML = `データ更新日：${latest} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.11.1</a>`;
+
+    } catch (e) {
+      console.error("データ読み込み失敗:", e);
+    }
+  }
+
+  function renderTable(filteredData) {
+    const tbody = document.querySelector("#resultTable tbody");
+    tbody.innerHTML = "";
+    filteredData.forEach(item => {
+      const nums = [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"], item["第6数字"]].join("・");
+      const row = `
+        <tr>
+          <td>${item["開催回"]}</td><td>${item["日付"]}</td><td>${nums}</td><td>${item["ボーナス数字"]}</td><td>${(item["特徴"] || "").split("・").map(f => `<a href="#" onclick="featureQuickSearch('${f}')">${f}</a>`).join("・")}</td>
+          <td>${formatYen(item["1等賞金"])}</td><td>${item["1等口数"]}</td>
+          <td>${formatYen(item["2等賞金"])}</td><td>${item["2等口数"]}</td>
+          <td>${formatYen(item["3等賞金"])}</td><td>${item["3等口数"]}</td>
+          <td>${formatYen(item["4等賞金"])}</td><td>${item["4等口数"]}</td>
+          <td>${formatYen(item["5等賞金"])}</td><td>${item["5等口数"]}</td>
+          <td>${formatYen(item["キャリーオーバー"])}</td>
+        </tr>`;
+      tbody.insertAdjacentHTML("beforeend", row);
+    });
+  }
+
+  function filterResults() {
+    const fromRound = parseInt(document.getElementById("fromRound").value) || 1;
+    const toRound = parseInt(document.getElementById("toRound").value) || 9999;
+    const fromDate = document.getElementById("fromDate").value;
+    const toDate = document.getElementById("toDate").value;
+    const checked = Array.from(document.querySelectorAll(".feature:checked")).map(el => el.value);
+    const filtered = data.filter(item => {
+  const includeNumbers = document.getElementById("includeNumbers").value.split(",").map(s => s.trim()).filter(s => s !== "").map(Number);const excludeNumbers = document.getElementById("excludeNumbers").value.split(",").map(s => s.trim()).filter(s => s !== "").map(Number);const round = parseInt(item["開催回"]);
+      const date = item["日付"];
+      const inRound = round >= fromRound && round <= toRound;
+      const inDate = (!fromDate || date >= fromDate) && (!toDate || date <= toDate);
+      const hasFeature = checked.length === 0 || checked.every(f => item["特徴"]?.includes(f));
+      
+    const nums = [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"], item["第6数字"]].map(n => Number(n));const includeMatch = includeNumbers.length === 0 || includeNumbers.every(n => nums.includes(Number(n)));
+    const excludeMatch = excludeNumbers.length === 0 || excludeNumbers.every(n => !nums.includes(Number(n)));
+    if (!includeMatch || !excludeMatch) {}
+    return inRound && inDate && hasFeature && includeMatch && excludeMatch;
+    
+    });
+    renderTable(filtered);
+    document.getElementById("resultCount").textContent = `検索結果：${filtered.length} 件（条件：` +
+    (fromRound !== 1 || toRound !== 9999 ? `開催回 ${fromRound}〜${toRound} ` : "") +
+    (fromDate || toDate ? `開催日 ${fromDate || '未指定'}〜${toDate || '未指定'} ` : "") +
+    (checked.length ? `特徴：` + checked.join("・") : "全件") + `)`;
+  }
+
+  function showPopup(event, text) {
+    const popup = document.getElementById("popupBox");
+    popup.textContent = text;
+    popup.style.display = "block";
+    popup.style.left = (event.pageX + 10) + "px";
+    popup.style.top = (event.pageY + 10) + "px";
+  }
+
+  function hidePopup() {
+    document.getElementById("popupBox").style.display = "none";
+  }
+
+  document.addEventListener("click", function(e) {
+    if (!e.target.classList.contains("info-icon")) hidePopup();
+  });
+
+  function scrollTableToTop() {
+    document.getElementById("scrollContainer").scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function scrollTableToBottom() {
+    const container = document.getElementById("scrollContainer");
+    container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    loadData();
+  });
+
+  function resetFilters() {
+    document.getElementById("fromRound").value = "";
+    document.getElementById("toRound").value = "";
+    document.getElementById("fromDate").value = "";
+    document.getElementById("toDate").value = "";
+    document.querySelectorAll(".feature").forEach(cb => cb.checked = false);
+  document.getElementById("includeNumbers").value = "";
+  document.getElementById("excludeNumbers").value = "";
+
+    document.getElementById("resultCount").textContent = "";
+    renderTable(data);
+
+      const dates = data.map(item => item["日付"]).sort();
+      const latest = dates[dates.length - 1];
+      document.getElementById("lastUpdated").innerHTML = `データ更新日：${latest} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.11.1</a>`;
+
+  }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadData();
+
+  const headers = document.querySelectorAll("#resultTable th");
+  headers.forEach((header, index) => {
+    header.style.cursor = "pointer";
+    header.addEventListener("click", () => sortTable(index));
+  });
+});
+
+let sortDirection = {};
+
+function sortTable(columnIndex) {
+  const table = document.getElementById("resultTable");
+  const tbody = table.querySelector("tbody");
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+  const isAsc = !sortDirection[columnIndex];
+  sortDirection[columnIndex] = isAsc;
+
+  rows.sort((a, b) => {
+    const aText = a.children[columnIndex].textContent.trim().replace(/[^\d.-]/g, "");
+    const bText = b.children[columnIndex].textContent.trim().replace(/[^\d.-]/g, "");
+    const aVal = isNaN(aText) ? aText : parseFloat(aText);
+    const bVal = isNaN(bText) ? bText : parseFloat(bText);
+    return isAsc ? (aVal > bVal ? 1 : -1) : (aVal < bVal ? 1 : -1);
+  });
+
+  rows.forEach(row => tbody.appendChild(row));
+}
+
+
+function featureQuickSearch(feature) {
+  document.querySelectorAll(".feature").forEach(cb => {
+    cb.checked = cb.value === feature;
+  });
+  filterResults();
+}
+
+</script>
 </body>
 </html>
