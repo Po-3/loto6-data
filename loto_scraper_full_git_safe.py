@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import os
+import subprocess
 from datetime import datetime
 
 def scrape_loto_data(url, loto_type):
@@ -100,7 +101,7 @@ def scrape_loto_data(url, loto_type):
         if abs(high - low) <= 1:
             features.append("高低ミックス")
 
-    if loto_type != 'miniloto' and int(carry_amount) > 0:
+    if loto_type != 'miniloto' and carry_amount.isdigit() and int(carry_amount) > 0:
         features.append("キャリーあり")
 
     data = {
@@ -135,6 +136,17 @@ def save_to_json(file_path, new_entry):
     with open(file_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
+def git_push():
+    try:
+        subprocess.run(["git", "add", "loto6.json"], check=True)
+        subprocess.run(["git", "add", "../loto7-data/loto7.json"], check=True)
+        subprocess.run(["git", "add", "../miniloto-data/miniloto_data_for_web_with_features.json"], check=True)
+        subprocess.run(["git", "commit", "-m", "♻️ ロト最新データ自動取得＆保存"], check=True)
+        subprocess.run(["git", "push"], check=True)
+        print("✅ GitHubにPush完了")
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Gitエラー: {e}")
+
 if __name__ == "__main__":
     targets = [
         ("https://loto6.thekyo.jp", "loto6", "/Users/po-san/hatena/loto6-data/loto6.json"),
@@ -150,3 +162,6 @@ if __name__ == "__main__":
             print(f"✅ 保存完了: {save_path}")
         else:
             print(f"❌ {loto_type.upper()} データ取得失敗")
+
+    # Git自動Push
+    git_push()
