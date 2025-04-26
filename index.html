@@ -258,6 +258,10 @@ td:first-child, th:first-child {
     container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
   }
 
+  document.addEventListener("DOMContentLoaded", () => {
+    loadData();
+  });
+
   function resetFilters() {
     document.getElementById("fromRound").value = "";
     document.getElementById("toRound").value = "";
@@ -315,13 +319,6 @@ function featureQuickSearch(feature) {
   filterResults();
 }
 
-</script>
-
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    loadData();
-});
 </script>
 
 </body>
