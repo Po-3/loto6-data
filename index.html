@@ -320,5 +320,21 @@ function featureQuickSearch(feature) {
 }
 
 </script>
+
+<script>
+// データ更新日＋ツールVerを動的に表示する
+fetch('loto6.json')
+  .then(response => response.json())
+  .then(data => {
+    const dates = data.map(item => item["日付"]).sort();
+    const latest = dates[dates.length - 1];
+    document.getElementById("lastUpdated").innerHTML = `データ更新日：${latest} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.11.2</a>`;
+  })
+  .catch(error => {
+    console.error('更新日取得エラー:', error);
+    document.getElementById("lastUpdated").innerHTML = `データ更新日取得エラー ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.11.2</a>`;
+  });
+</script>
+
 </body>
 </html>
