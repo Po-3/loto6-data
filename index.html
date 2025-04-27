@@ -1,84 +1,67 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ロト6結果検索ツール</title>
-<style>
-  body { font-family: sans-serif; margin: 20px; }
-  h1 { text-align: center; }
-  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-  th, td { border: 1px solid #ccc; padding: 8px; text-align: center; white-space: nowrap; }
-  th { background: #f2f2f2; position: sticky; top: 0; z-index: 10; cursor: pointer; }
-  th:first-child, td:first-child { background: #fff; position: sticky; left: 0; z-index: 9; }
-  .button-search { background-color: #f28b82; color: #fff; padding: 8px 16px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin: 5px; text-decoration: none; }
-  .info-icon { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ddd; color: #333; font-size: 12px; text-align: center; line-height: 16px; margin-left: 4px; cursor: pointer; position: relative; }
-  .info-icon::after { content: attr(data-info); position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 6px 10px; border-radius: 5px; white-space: nowrap; font-size: 12px; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 10; }
-  .info-icon:hover::after { opacity: 1; }
-  .clickable-feature { color: blue; text-decoration: underline; cursor: pointer; margin: 0 4px; }
-</style>
+  <meta charset="UTF-8">
+  <title>ロト6検索ツール</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #f2f2f2; }
+    .info-bar { margin-top: 10px; font-size: 14px; color: #555; }
+  </style>
 </head>
 <body>
 
-<div style="text-align:center; margin-bottom:10px;">
-  <a href="https://po-3.github.io/loto7-data/" target="_blank" class="button-search">ロト7</a>
-  <a href="https://po-3.github.io/miniloto-data/" target="_blank" class="button-search">ミニロト</a>
-</div>
+<h1>ロト6検索ツール</h1>
+<div class="info-bar" id="info-bar">データ更新日：読込中... ｜ツールVer：1.11.2</div>
 
-<div style="text-align:center;">
-  <h1>ロト6結果検索ツール</h1>
-  <div style="font-size:14px; color:#666;">データ更新日：<span id="lastUpdated"></span> ／ Ver：1.00</div>
-</div>
-
-<div id="searchArea" style="margin-top:30px; padding:20px; border:1px solid #ddd; border-radius:10px; background:#f9f9f9;">
-  <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
-    <div><label>開催回 From：</label><input type="number" id="from" style="width:100px;"></div>
-    <div><label>開催回 To：</label><input type="number" id="to" style="width:100px;"></div>
-    <div><label>開催日 From：</label><input type="date" id="dateFrom" style="width:150px;"></div>
-    <div><label>開催日 To：</label><input type="date" id="dateTo" style="width:150px;"></div>
-    <div><label>含む数字：</label><input type="text" id="includeNumbers" placeholder="例: 12,25,31" style="width:150px;"></div>
-    <div><label>除く数字：</label><input type="text" id="excludeNumbers" placeholder="例: 8,19" style="width:150px;"></div>
-    <div>
-      <button class="button-search" onclick="searchData()">🔍 検索</button>
-      <button class="button-search" onclick="resetForm()">🧹 リセット</button>
-    </div>
-  </div>
-  <div style="margin-top:20px; text-align:center;">
-    <span style="font-weight:bold;">特徴で絞り込み：</span><br>
-    <label><input type="checkbox" class="feature" value="連番あり">連番あり<span class="info-icon" data-info="本数字に連続した数字（例：15と16）が含まれる"></span></label>
-    <label><input type="checkbox" class="feature" value="奇数多め">奇数多め<span class="info-icon" data-info="本数字のうち奇数が4個以上"></span></label>
-    <label><input type="checkbox" class="feature" value="偶数多め">偶数多め<span class="info-icon" data-info="本数字のうち偶数が4個以上"></span></label>
-    <label><input type="checkbox" class="feature" value="下一桁かぶり">下一桁かぶり<span class="info-icon" data-info="下一桁が同じ数字が複数存在"></span></label>
-    <label><input type="checkbox" class="feature" value="合計小さめ">合計小さめ<span class="info-icon" data-info="本数字の合計が114未満"></span></label>
-    <label><input type="checkbox" class="feature" value="合計大きめ">合計大きめ<span class="info-icon" data-info="本数字の合計が151超"></span></label>
-    <label><input type="checkbox" class="feature" value="キャリーあり">キャリーあり<span class="info-icon" data-info="キャリーオーバーが発生している"></span></label>
-  </div>
-</div>
-
-<div style="overflow-x:auto; margin-top:20px;">
-  <table id="resultTable">
-    <thead>
-      <tr>
-        <th>開催回</th><th>開催日</th><th>本数字</th><th>ボーナス</th><th>特徴</th>
-        <th>1等口数</th><th>1等賞金</th><th>2等口数</th><th>2等賞金</th>
-        <th>3等口数</th><th>3等賞金</th><th>4等口数</th><th>4等賞金</th>
-        <th>5等口数</th><th>5等賞金</th><th>キャリーオーバー</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td colspan="16">データ読み込み中...</td></tr>
-    </tbody>
-  </table>
-</div>
-
-<div style="text-align:center; margin:20px 0;">
-  <button class="button-search" onclick="scrollToTop()">⬆️ 最上段へ</button>
-  <button class="button-search" onclick="scrollToBottom()">⬇️ 最下段へ</button>
-</div>
+<table id="loto6-table">
+  <thead>
+    <tr>
+      <th>開催回</th>
+      <th>日付</th>
+      <th>本数字</th>
+      <th>BONUS</th>
+      <th>特徴</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- データ挿入場所 -->
+  </tbody>
+</table>
 
 <script>
-// JavaScriptは別途ファイルまたは続きで記述する
+async function loadData() {
+  const res = await fetch('./loto6.json');
+  const data = await res.json();
+
+  const tbody = document.getElementById('loto6-table').querySelector('tbody');
+  tbody.innerHTML = '';
+
+  // 最新開催回の日付を取得（配列の一番後ろが最新回）
+  const latest = data[data.length - 1];
+  const infoBar = document.getElementById('info-bar');
+  if (latest && latest['日付']) {
+    infoBar.innerText = `データ更新日：${latest['日付']} ｜ツールVer：1.11.2`;
+  }
+
+  // テーブルにデータ挿入（降順に表示）
+  data.slice().reverse().forEach(row => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${row['開催回']}</td>
+      <td>${row['日付']}</td>
+      <td>${row['第1数字']}・${row['第2数字']}・${row['第3数字']}・${row['第4数字']}・${row['第5数字']}・${row['第6数字']}</td>
+      <td>${row['BONUS数字'] || '-'}</td>
+      <td>${row['特徴'] || '-'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+loadData();
 </script>
 
 </body>
