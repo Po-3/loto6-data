@@ -5,14 +5,12 @@
   <title>ロト6検索ツール</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #ffe6f0; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
-    th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
-    th { background-color: #ffccd5; }
-    .info-bar { margin-top: 10px; font-size: 14px; color: #333; }
-    button { margin: 10px 5px; padding: 5px 10px; font-size: 14px; }
-    input { padding: 5px; margin: 5px; width: 180px; }
-    .feature-link { cursor: pointer; color: blue; text-decoration: underline; }
+    body { font-family: Arial, sans-serif; margin: 20px; background-color: #fff0f5; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #ffe4e1; }
+    .info-bar { margin-top: 10px; font-size: 14px; color: #555; }
+    thead th.sticky { position: sticky; left: 0; background: #ffe4e1; }
   </style>
 </head>
 <body>
@@ -20,17 +18,10 @@
 <h1>ロト6検索ツール</h1>
 <div class="info-bar" id="info-bar">データ更新日：読込中... ｜ツールVer：1.11.2</div>
 
-<div>
-  <input type="text" id="include-input" placeholder="含む数字 (カンマ区切り)">
-  <input type="text" id="exclude-input" placeholder="除く数字 (カンマ区切り)">
-  <button onclick="filterTable()">検索</button>
-  <button onclick="resetTable()">リセット</button>
-</div>
-
 <table id="loto6-table">
   <thead>
     <tr>
-      <th>開催回 🔽</th>
+      <th class="sticky">開催回 🔽</th>
       <th>日付 🔽</th>
       <th>本数字 🔽</th>
       <th>ボーナス 🔽</th>
@@ -45,7 +36,7 @@
       <th>4等賞金 🔽</th>
       <th>5等口数 🔽</th>
       <th>5等賞金 🔽</th>
-      <th>キャリー 🔽</th>
+      <th>キャリーオーバー 🔽</th>
     </tr>
   </thead>
   <tbody>
@@ -54,27 +45,23 @@
 </table>
 
 <script>
-let originalData = [];
-let sortKey = '';
-let sortAsc = false;
-
 async function loadData() {
   const res = await fetch('./loto6.json');
   const data = await res.json();
-  originalData = data.slice().reverse(); // 開催回で降順表示
 
-  const latest = originalData[0];
+  const tbody = document.getElementById('loto6-table').querySelector('tbody');
+  tbody.innerHTML = '';
+
+  // 最新開催回の日付を取得
+  const latest = data[data.length - 1];
   const infoBar = document.getElementById('info-bar');
   if (latest && latest['日付']) {
     infoBar.innerText = `データ更新日：${latest['日付']} ｜ツールVer：1.11.2`;
   }
 
-  renderTable(originalData);
-}
+  // 開催回で降順に並び替えて表示
+  data.sort((a, b) => Number(b['開催回']) - Number(a['開催回']));
 
-function renderTable(data) {
-  const tbody = document.getElementById('loto6-table').querySelector('tbody');
-  tbody.innerHTML = '';
   data.forEach(row => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -82,7 +69,7 @@ function renderTable(data) {
       <td>${row['日付']}</td>
       <td>${row['第1数字']}・${row['第2数字']}・${row['第3数字']}・${row['第4数字']}・${row['第5数字']}・${row['第6数字']}</td>
       <td>${row['BONUS数字'] || '-'}</td>
-      <td><span class="feature-link" onclick="searchFeature('${row['特徴']}')">${row['特徴'] || '-'}</span></td>
+      <td>${row['特徴'] || '-'}</td>
       <td>${row['1等口数']}</td>
       <td>${row['1等賞金']}</td>
       <td>${row['2等口数']}</td>
@@ -93,34 +80,13 @@ function renderTable(data) {
       <td>${row['4等賞金']}</td>
       <td>${row['5等口数']}</td>
       <td>${row['5等賞金']}</td>
-      <td>${row['キャリー'] || '-'}</td>
+      <td>${row['キャリーオーバー'] || '-'}</td>
     `;
     tbody.appendChild(tr);
   });
 }
 
-function filterTable() {
-  const includeNums = document.getElementById('include-input').value.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
-  const excludeNums = document.getElementById('exclude-input').value.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
-
-  const filtered = originalData.filter(row => {
-    const numbers = [row['第1数字'], row['第2数字'], row['第3数字'], row['第4数字'], row['第5数字'], row['第6数字']].map(Number);
-    return includeNums.every(num => numbers.includes(num)) && excludeNums.every(num => !numbers.includes(num));
-  });
-  renderTable(filtered);
-}
-
-function resetTable() {
-  document.getElementById('include-input').value = '';
-  document.getElementById('exclude-input').value = '';
-  renderTable(originalData);
-}
-
-function searchFeature(feature) {
-  if (!feature || feature === '-') return;
-  const filtered = originalData.filter(row => row['特徴'] && row['特徴'].includes(feature));
-  renderTable(filtered);
-}
+loadData();
 </script>
 
 </body>
