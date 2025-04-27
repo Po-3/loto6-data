@@ -5,11 +5,14 @@
   <title>ロト6検索ツール</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; font-size: 14px; }
-    th { background-color: #f2f2f2; }
+    body { font-family: Arial, sans-serif; margin: 20px; background: #ffe4e1; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #ffccd5; }
+    input { margin-right: 5px; padding: 5px; }
+    button { padding: 5px 10px; margin-right: 5px; }
     .info-bar { margin-top: 10px; font-size: 14px; color: #555; }
+    .scroll-button { position: fixed; bottom: 20px; right: 20px; padding: 8px 12px; background: #ff6b81; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -17,58 +20,137 @@
 <h1>ロト6検索ツール</h1>
 <div class="info-bar" id="info-bar">データ更新日：読込中... ｜ツールVer：1.11.2</div>
 
+<div style="margin: 10px 0;">
+  <input type="text" id="include" placeholder="含む数字(例: 3,15)">
+  <input type="text" id="exclude" placeholder="除く数字(例: 7,22)">
+  <button onclick="filterTable()">検索</button>
+  <button onclick="resetTable()">リセット</button>
+</div>
+
 <table id="loto6-table">
   <thead>
     <tr>
-      <th>開催回</th>
-      <th>日付</th>
-      <th>本数字</th>
-      <th>BONUS</th>
-      <th>特徴</th>
+      <th onclick="sortTable(0)">開催回 🔽</th>
+      <th onclick="sortTable(1)">日付 🔽</th>
+      <th onclick="sortTable(2)">本数字 🔽</th>
+      <th onclick="sortTable(3)">ボーナス 🔽</th>
+      <th onclick="sortTable(4)">特徴 🔽</th>
+      <th onclick="sortTable(5)">1等 🔽</th>
+      <th onclick="sortTable(6)">2等 🔽</th>
+      <th onclick="sortTable(7)">3等 🔽</th>
+      <th onclick="sortTable(8)">4等 🔽</th>
+      <th onclick="sortTable(9)">5等 🔽</th>
     </tr>
   </thead>
   <tbody>
-    <!-- データ挿入場所 -->
+    <!-- データ挿入 -->
   </tbody>
 </table>
 
+<button class="scroll-button" onclick="scrollToTop()">⬆️</button>
+
 <script>
+let originalData = [];
+
 async function loadData() {
-  try {
-    const res = await fetch('./loto6.json');
-    const data = await res.json();
+  const res = await fetch('./loto6.json');
+  const data = await res.json();
+  originalData = data;
 
-    const tbody = document.getElementById('loto6-table').querySelector('tbody');
-    tbody.innerHTML = '';
+  const tbody = document.getElementById('loto6-table').querySelector('tbody');
+  tbody.innerHTML = '';
 
-    // データを開催回降順に並び替え
-    data.sort((a, b) => Number(b['開催回']) - Number(a['開催回']));
+  // 最新開催回の日付を取得（配列の最後が最新）
+  const latest = data[data.length - 1];
+  const infoBar = document.getElementById('info-bar');
+  if (latest && latest['日付']) {
+    infoBar.innerText = `データ更新日：${latest['日付']} ｜ツールVer：1.11.2`;
+  }
 
-    // 最新回の日付をinfo-barに表示
-    if (data.length > 0) {
-      const latestDate = data[0]['日付'] || '不明';
-      document.getElementById('info-bar').innerText = `データ更新日：${latestDate} ｜ツールVer：1.11.2`;
+  displayTable(data);
+}
+
+function displayTable(data) {
+  const tbody = document.getElementById('loto6-table').querySelector('tbody');
+  tbody.innerHTML = '';
+
+  data.slice().reverse().forEach(row => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${row['開催回']}</td>
+      <td>${row['日付']}</td>
+      <td>${row['第1数字']}・${row['第2数字']}・${row['第3数字']}・${row['第4数字']}・${row['第5数字']}・${row['第6数字']}</td>
+      <td>${row['BONUS数字'] || '-'}</td>
+      <td>${row['特徴'] || '-'}</td>
+      <td>${row['1等口数'] || '-'}</td>
+      <td>${row['2等口数'] || '-'}</td>
+      <td>${row['3等口数'] || '-'}</td>
+      <td>${row['4等口数'] || '-'}</td>
+      <td>${row['5等口数'] || '-'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function filterTable() {
+  const include = document.getElementById('include').value.split(',').map(Number).filter(n => !isNaN(n));
+  const exclude = document.getElementById('exclude').value.split(',').map(Number).filter(n => !isNaN(n));
+
+  let filtered = originalData.filter(row => {
+    const nums = [row['第1数字'], row['第2数字'], row['第3数字'], row['第4数字'], row['第5数字'], row['第6数字']].map(Number);
+    return include.every(n => nums.includes(n)) && exclude.every(n => !nums.includes(n));
+  });
+
+  displayTable(filtered);
+}
+
+function resetTable() {
+  document.getElementById('include').value = '';
+  document.getElementById('exclude').value = '';
+  displayTable(originalData);
+}
+
+function sortTable(n) {
+  const table = document.getElementById("loto6-table");
+  let switching = true;
+  let dir = "desc";
+
+  while (switching) {
+    switching = false;
+    const rows = table.rows;
+    for (let i = 1; i < rows.length - 1; i++) {
+      let shouldSwitch = false;
+      let x = rows[i].getElementsByTagName("TD")[n];
+      let y = rows[i + 1].getElementsByTagName("TD")[n];
+      if (dir == "asc") {
+        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+          shouldSwitch = true;
+          break;
+        }
+      } else if (dir == "desc") {
+        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+          shouldSwitch = true;
+          break;
+        }
+      }
     }
-
-    // テーブルにデータを埋め込む
-    data.forEach(row => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${row['開催回']}</td>
-        <td>${row['日付']}</td>
-        <td>${row['第1数字']}・${row['第2数字']}・${row['第3数字']}・${row['第4数字']}・${row['第5数字']}・${row['第6数字']}</td>
-        <td>${row['BONUS数字'] || '-'}</td>
-        <td>${row['特徴'] || '-'}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-  } catch (error) {
-    console.error('データの読み込みに失敗しました:', error);
-    document.getElementById('info-bar').innerText = 'データ更新日：取得失敗 ｜ツールVer：1.11.2';
+    if (shouldSwitch) {
+      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+      switching = true;
+    } else {
+      if (dir == "desc") {
+        dir = "asc";
+      } else {
+        dir = "desc";
+      }
+    }
   }
 }
 
-// データロード実行
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 loadData();
 </script>
 
