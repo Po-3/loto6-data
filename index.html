@@ -1,84 +1,68 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="ja">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.5">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  <meta charset="UTF-8">
+  <title>ロト6検索ツール</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #f2f2f2; }
+    .info-bar { margin-top: 10px; font-size: 14px; color: #555; }
   </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="ja"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;ロト6検索ツール&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>body { font-family: Arial, sans-serif; margin: 20px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>table { width: 100%; border-collapse: collapse; margin-top: 20px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>th { background-color: #f2f2f2; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.info-bar { margin-top: 10px; font-size: 14px; color: #555; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;h1&gt;ロト6検索ツール&lt;/h1&gt;</p>
-<p class="p1">&lt;div class="info-bar" id="info-bar"&gt;データ更新日：読込中... ｜ツールVer：1.11.2&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;table id="loto6-table"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;thead&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;tr&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;th&gt;開催回&lt;/th&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;th&gt;日付&lt;/th&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;th&gt;本数字&lt;/th&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;th&gt;BONUS&lt;/th&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;th&gt;特徴&lt;/th&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/tr&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/thead&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;tbody&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- データ挿入場所 --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/tbody&gt;</p>
-<p class="p1">&lt;/table&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;script&gt;</p>
-<p class="p1">async function loadData() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const res = await fetch('./loto6.json');</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const data = await res.json();</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const tbody = document.getElementById('loto6-table').querySelector('tbody');</p>
-<p class="p1"><span class="Apple-converted-space">  </span>tbody.innerHTML = '';</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>// 最新開催回の日付を取得（配列の一番後ろが最新回）</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const latest = data[data.length - 1];</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const infoBar = document.getElementById('info-bar');</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if (latest &amp;&amp; latest['日付']) {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>infoBar.innerText = `データ更新日：${latest['日付']} ｜ツールVer：1.11.2`;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>// テーブルにデータ挿入（降順に表示）</p>
-<p class="p1"><span class="Apple-converted-space">  </span>data.slice().reverse().forEach(row =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const tr = document.createElement('tr');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>tr.innerHTML = `</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;td&gt;${row['開催回']}&lt;/td&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;td&gt;${row['日付']}&lt;/td&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;td&gt;${row['第1数字']}・${row['第2数字']}・${row['第3数字']}・${row['第4数字']}・${row['第5数字']}・${row['第6数字']}&lt;/td&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;td&gt;${row['BONUS数字'] || '-'}&lt;/td&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;td&gt;${row['特徴'] || '-'}&lt;/td&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>tbody.appendChild(tr);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">loadData();</p>
-<p class="p1">&lt;/script&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+
+<h1>ロト6検索ツール</h1>
+<div class="info-bar" id="info-bar">データ更新日：読込中... ｜ツールVer：1.11.2</div>
+
+<table id="loto6-table">
+  <thead>
+    <tr>
+      <th>開催回</th>
+      <th>日付</th>
+      <th>本数字</th>
+      <th>BONUS</th>
+      <th>特徴</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- データ挿入場所 -->
+  </tbody>
+</table>
+
+<script>
+async function loadData() {
+  const res = await fetch('./loto6.json');
+  const data = await res.json();
+
+  const tbody = document.getElementById('loto6-table').querySelector('tbody');
+  tbody.innerHTML = '';
+
+  // 最新開催回の日付を取得（配列の一番後ろが最新回）
+  const latest = data[data.length - 1];
+  const infoBar = document.getElementById('info-bar');
+  if (latest && latest['日付']) {
+    infoBar.innerText = `データ更新日：${latest['日付']} ｜ツールVer：1.11.2`;
+  }
+
+  // テーブルにデータ挿入（降順に表示）
+  data.slice().reverse().forEach(row => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${row['開催回']}</td>
+      <td>${row['日付']}</td>
+      <td>${row['第1数字']}・${row['第2数字']}・${row['第3数字']}・${row['第4数字']}・${row['第5数字']}・${row['第6数字']}</td>
+      <td>${row['BONUS数字'] || '-'}</td>
+      <td>${row['特徴'] || '-'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+loadData();
+</script>
+
 </body>
 </html>
