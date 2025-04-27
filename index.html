@@ -2,67 +2,28 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>ロト6検索ツール</title>
+  <title>ロト6検索ツール - 工事中</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background-color: #f2f2f2; }
-    .info-bar { margin-top: 10px; font-size: 14px; color: #555; }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 100px 20px;
+      background-color: #ffe4e1;
+    }
+    h1 {
+      font-size: 28px;
+      color: #333;
+    }
+    p {
+      font-size: 18px;
+      color: #666;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
-
-<h1>ロト6検索ツール</h1>
-<div class="info-bar" id="info-bar">データ更新日：読込中... ｜ツールVer：1.11.2</div>
-
-<table id="loto6-table">
-  <thead>
-    <tr>
-      <th>開催回</th>
-      <th>日付</th>
-      <th>本数字</th>
-      <th>BONUS</th>
-      <th>特徴</th>
-    </tr>
-  </thead>
-  <tbody>
-    <!-- データ挿入場所 -->
-  </tbody>
-</table>
-
-<script>
-async function loadData() {
-  const res = await fetch('./loto6.json');
-  const data = await res.json();
-
-  const tbody = document.getElementById('loto6-table').querySelector('tbody');
-  tbody.innerHTML = '';
-
-  // 最新開催回の日付を取得（配列の一番後ろが最新回）
-  const latest = data[data.length - 1];
-  const infoBar = document.getElementById('info-bar');
-  if (latest && latest['日付']) {
-    infoBar.innerText = `データ更新日：${latest['日付']} ｜ツールVer：1.11.2`;
-  }
-
-  // テーブルにデータ挿入（降順に表示）
-  data.slice().reverse().forEach(row => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${row['開催回']}</td>
-      <td>${row['日付']}</td>
-      <td>${row['第1数字']}・${row['第2数字']}・${row['第3数字']}・${row['第4数字']}・${row['第5数字']}・${row['第6数字']}</td>
-      <td>${row['BONUS数字'] || '-'}</td>
-      <td>${row['特徴'] || '-'}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-loadData();
-</script>
-
+  <h1>🚧 ロト6検索ツール</h1>
+  <p>現在メンテナンス中です。しばらくお待ちください。</p>
 </body>
 </html>
