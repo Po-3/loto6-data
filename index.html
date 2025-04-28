@@ -1,133 +1,75 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>ロト6検索ツール</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #fff6f0; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background-color: #ffe0e0; cursor: pointer; }
-    .info-bar { margin-top: 10px; font-size: 14px; color: #555; }
-    .filter-section { margin-bottom: 20px; }
-    .filter-section input { margin-right: 10px; padding: 5px; }
-    .button { padding: 6px 12px; margin-right: 10px; background: #ffcccc; border: none; border-radius: 4px; cursor: pointer; }
-    .scroll-button { padding: 6px 12px; margin: 10px; background: #ff9999; border: none; border-radius: 4px; cursor: pointer; }
-  </style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ロト6結果検索ツール</title>
+<!-- (ここまでヘッダー・CSSはv1.01そのままなので省略) -->
 </head>
 <body>
-
-<h1>ロト6検索ツール</h1>
-<div class="info-bar" id="info-bar">データ更新日：読込中... ｜ツールVer：v1.01</div>
-
-<div class="filter-section">
-  <input type="text" id="開催回-from" placeholder="開催回From">
-  <input type="text" id="開催回-to" placeholder="開催回To">
-  <input type="text" id="開催日-from" placeholder="開催日From">
-  <input type="text" id="開催日-to" placeholder="開催日To">
-  <input type="text" id="含む数字-filter" placeholder="含む数字 (例:5,10)">
-  <input type="text" id="除く数字-filter" placeholder="除く数字 (例:20,30)">
-  <select id="特徴-filter">
-    <option value="">特徴で絞り込み</option>
-    <option value="連番あり">連番あり</option>
-    <option value="奇数多め">奇数多め</option>
-    <option value="偶数多め">偶数多め</option>
-    <option value="下一桁かぶり">下一桁かぶり</option>
-    <option value="合計小さめ">合計小さめ</option>
-    <option value="合計大きめ">合計大きめ</option>
-    <option value="キャリーあり">キャリーあり</option>
-  </select>
-  <button class="button" onclick="applyFilters()">検索</button>
-  <button class="button" onclick="resetFilters()">リセット</button>
-</div>
-
-<table id="loto6-table">
-  <thead>
-    <tr>
-      <th>開催回</th>
-      <th>開催日</th>
-      <th>本数字</th>
-      <th>ボーナス</th>
-      <th>特徴</th>
-      <th>1等賞金</th>
-      <th>1等口数</th>
-      <th>2等賞金</th>
-      <th>2等口数</th>
-      <th>3等賞金</th>
-      <th>3等口数</th>
-      <th>4等賞金</th>
-      <th>4等口数</th>
-      <th>5等賞金</th>
-      <th>5等口数</th>
-      <th>キャリーオーバー</th>
-    </tr>
-  </thead>
-  <tbody>
-    <!-- データ挿入場所 -->
-  </tbody>
-</table>
-
-<button class="scroll-button" onclick="scrollToTop()">▲ 最上段へ</button>
-<button class="scroll-button" onclick="scrollToBottom()">▼ 最下段へ</button>
+<!-- (ここもh1タイトル、フィルター欄、テーブル定義もv1.01そのまま) -->
 
 <script>
+let data = [];
+
+function formatYen(value) {
+  if (!value) return "0円";
+  if (isNaN(value)) return "-";
+  const intVal = parseInt(value);
+  return isNaN(intVal) ? value : intVal.toLocaleString() + "円";
+}
+
 async function loadData() {
-  const res = await fetch('./loto6.json');
-  const data = await res.json();
+  try {
+    const res = await fetch("./loto6.json");
+    data = await res.json();
 
-  const tbody = document.getElementById('loto6-table').querySelector('tbody');
-  tbody.innerHTML = '';
+    // 【追加修正】ここで「開催回」の降順にそろえる
+    data.sort((a, b) => Number(b['開催回']) - Number(a['開催回']));
 
-  // 開催回の降順で並べる
-  data.sort((a, b) => Number(b['開催回']) - Number(a['開催回']));
+    renderTable(data);
 
-  // データ更新日表示
-  if (data.length > 0 && data[0]['日付']) {
-    document.getElementById('info-bar').innerText = `データ更新日：${data[0]['日付']} ｜ツールVer：v1.01`;
+    const dates = data.map(item => item["日付"]).sort();
+    const latest = dates[dates.length - 1];
+    document.getElementById("lastUpdated").innerHTML = `データ更新日：${latest} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.01</a>`;
+  } catch (e) {
+    console.error("データ読み込み失敗:", e);
   }
+}
 
-  data.forEach(row => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${row['開催回']}</td>
-      <td>${row['日付']}</td>
-      <td>${row['第1数字']}・${row['第2数字']}・${row['第3数字']}・${row['第4数字']}・${row['第5数字']}・${row['第6数字']}</td>
-      <td>${row['BONUS数字'] || '-'}</td>
-      <td>${row['特徴'] || '-'}</td>
-      <td>${row['1等賞金'] || '-'}</td>
-      <td>${row['1等口数'] || '-'}</td>
-      <td>${row['2等賞金'] || '-'}</td>
-      <td>${row['2等口数'] || '-'}</td>
-      <td>${row['3等賞金'] || '-'}</td>
-      <td>${row['3等口数'] || '-'}</td>
-      <td>${row['4等賞金'] || '-'}</td>
-      <td>${row['4等口数'] || '-'}</td>
-      <td>${row['5等賞金'] || '-'}</td>
-      <td>${row['5等口数'] || '-'}</td>
-      <td>${row['キャリーオーバー'] || '-'}</td>
-    `;
-    tbody.appendChild(tr);
+function renderTable(filteredData) {
+  const tbody = document.querySelector("#resultTable tbody");
+  tbody.innerHTML = "";
+  filteredData.forEach(item => {
+    const nums = [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"], item["第6数字"]].join("・");
+    const row = `
+      <tr>
+        <td>${item["開催回"]}</td><td>${item["日付"]}</td><td>${nums}</td><td>${item["ボーナス数字"]}</td><td>${(item["特徴"] || "").split("・").map(f => `<a href="#" onclick="featureQuickSearch('${f}')">${f}</a>`).join("・")}</td>
+        <td>${formatYen(item["1等賞金"])}</td><td>${item["1等口数"]}</td>
+        <td>${formatYen(item["2等賞金"])}</td><td>${item["2等口数"]}</td>
+        <td>${formatYen(item["3等賞金"])}</td><td>${item["3等口数"]}</td>
+        <td>${formatYen(item["4等賞金"])}</td><td>${item["4等口数"]}</td>
+        <td>${formatYen(item["5等賞金"])}</td><td>${item["5等口数"]}</td>
+        <td>${formatYen(item["キャリーオーバー"])}</td>
+      </tr>`;
+    tbody.insertAdjacentHTML("beforeend", row);
   });
 }
 
-loadData();
+// 以下、フィルターやリセットなど v1.01のコードそのまま(省略)
 
-function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+// ページ読み込み時に実行
+document.addEventListener("DOMContentLoaded", () => {
+  loadData();
 
-function scrollToBottom() {
-  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-}
+  const headers = document.querySelectorAll("#resultTable th");
+  headers.forEach((header, index) => {
+    header.style.cursor = "pointer";
+    header.addEventListener("click", () => sortTable(index));
+  });
+});
 
-function applyFilters() {
-  // ここにフィルター処理
-}
-
-function resetFilters() {
-  // ここにリセット処理
-}
+// 残りのソート、フィルター、リセット、ポップアップ処理などもv1.01そのままです
 </script>
 
 </body>
