@@ -2,28 +2,133 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>ロト6検索ツール - 工事中</title>
+  <title>ロト6検索ツール</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 100px 20px;
-      background-color: #ffe4e1;
-    }
-    h1 {
-      font-size: 28px;
-      color: #333;
-    }
-    p {
-      font-size: 18px;
-      color: #666;
-      margin-top: 20px;
-    }
+    body { font-family: Arial, sans-serif; margin: 20px; background: #fff6f0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #ffe0e0; cursor: pointer; }
+    .info-bar { margin-top: 10px; font-size: 14px; color: #555; }
+    .filter-section { margin-bottom: 20px; }
+    .filter-section input { margin-right: 10px; padding: 5px; }
+    .button { padding: 6px 12px; margin-right: 10px; background: #ffcccc; border: none; border-radius: 4px; cursor: pointer; }
+    .scroll-button { padding: 6px 12px; margin: 10px; background: #ff9999; border: none; border-radius: 4px; cursor: pointer; }
   </style>
 </head>
 <body>
-  <h1>🚧 ロト6検索ツール</h1>
-  <p>現在メンテナンス中です。しばらくお待ちください。</p>
+
+<h1>ロト6検索ツール</h1>
+<div class="info-bar" id="info-bar">データ更新日：読込中... ｜ツールVer：v1.01</div>
+
+<div class="filter-section">
+  <input type="text" id="開催回-from" placeholder="開催回From">
+  <input type="text" id="開催回-to" placeholder="開催回To">
+  <input type="text" id="開催日-from" placeholder="開催日From">
+  <input type="text" id="開催日-to" placeholder="開催日To">
+  <input type="text" id="含む数字-filter" placeholder="含む数字 (例:5,10)">
+  <input type="text" id="除く数字-filter" placeholder="除く数字 (例:20,30)">
+  <select id="特徴-filter">
+    <option value="">特徴で絞り込み</option>
+    <option value="連番あり">連番あり</option>
+    <option value="奇数多め">奇数多め</option>
+    <option value="偶数多め">偶数多め</option>
+    <option value="下一桁かぶり">下一桁かぶり</option>
+    <option value="合計小さめ">合計小さめ</option>
+    <option value="合計大きめ">合計大きめ</option>
+    <option value="キャリーあり">キャリーあり</option>
+  </select>
+  <button class="button" onclick="applyFilters()">検索</button>
+  <button class="button" onclick="resetFilters()">リセット</button>
+</div>
+
+<table id="loto6-table">
+  <thead>
+    <tr>
+      <th>開催回</th>
+      <th>開催日</th>
+      <th>本数字</th>
+      <th>ボーナス</th>
+      <th>特徴</th>
+      <th>1等賞金</th>
+      <th>1等口数</th>
+      <th>2等賞金</th>
+      <th>2等口数</th>
+      <th>3等賞金</th>
+      <th>3等口数</th>
+      <th>4等賞金</th>
+      <th>4等口数</th>
+      <th>5等賞金</th>
+      <th>5等口数</th>
+      <th>キャリーオーバー</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- データ挿入場所 -->
+  </tbody>
+</table>
+
+<button class="scroll-button" onclick="scrollToTop()">▲ 最上段へ</button>
+<button class="scroll-button" onclick="scrollToBottom()">▼ 最下段へ</button>
+
+<script>
+async function loadData() {
+  const res = await fetch('./loto6.json');
+  const data = await res.json();
+
+  const tbody = document.getElementById('loto6-table').querySelector('tbody');
+  tbody.innerHTML = '';
+
+  // 開催回の降順で並べる
+  data.sort((a, b) => Number(b['開催回']) - Number(a['開催回']));
+
+  // データ更新日表示
+  if (data.length > 0 && data[0]['日付']) {
+    document.getElementById('info-bar').innerText = `データ更新日：${data[0]['日付']} ｜ツールVer：v1.01`;
+  }
+
+  data.forEach(row => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${row['開催回']}</td>
+      <td>${row['日付']}</td>
+      <td>${row['第1数字']}・${row['第2数字']}・${row['第3数字']}・${row['第4数字']}・${row['第5数字']}・${row['第6数字']}</td>
+      <td>${row['BONUS数字'] || '-'}</td>
+      <td>${row['特徴'] || '-'}</td>
+      <td>${row['1等賞金'] || '-'}</td>
+      <td>${row['1等口数'] || '-'}</td>
+      <td>${row['2等賞金'] || '-'}</td>
+      <td>${row['2等口数'] || '-'}</td>
+      <td>${row['3等賞金'] || '-'}</td>
+      <td>${row['3等口数'] || '-'}</td>
+      <td>${row['4等賞金'] || '-'}</td>
+      <td>${row['4等口数'] || '-'}</td>
+      <td>${row['5等賞金'] || '-'}</td>
+      <td>${row['5等口数'] || '-'}</td>
+      <td>${row['キャリーオーバー'] || '-'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+loadData();
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function scrollToBottom() {
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
+function applyFilters() {
+  // ここにフィルター処理
+}
+
+function resetFilters() {
+  // ここにリセット処理
+}
+</script>
+
 </body>
 </html>
