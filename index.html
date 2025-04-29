@@ -311,13 +311,38 @@ function sortTable(columnIndex) {
   const isAsc = !sortDirection[columnIndex];
   sortDirection[columnIndex] = isAsc;
 
+function sortTable(columnIndex) {
+  const table = document.getElementById("resultTable");
+  const tbody = table.querySelector("tbody");
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+  const isAsc = !sortDirection[columnIndex];
+  sortDirection[columnIndex] = isAsc;
+
+  // 🔁 この部分（rows.sort(...)）だけを置き換えればOK
   rows.sort((a, b) => {
-    const aText = a.children[columnIndex].textContent.trim().replace(/[^\d.-]/g, "");
-    const bText = b.children[columnIndex].textContent.trim().replace(/[^\d.-]/g, "");
-    const aVal = isNaN(aText) ? aText : parseFloat(aText);
-    const bVal = isNaN(bText) ? bText : parseFloat(bText);
-    return isAsc ? (aVal > bVal ? 1 : -1) : (aVal < bVal ? 1 : -1);
+    const aText = a.children[columnIndex].textContent.trim();
+    const bText = b.children[columnIndex].textContent.trim();
+
+    const extractFirstNumber = str => {
+      const match = str.match(/\d+/);
+      return match ? parseInt(match[0], 10) : 0;
+    };
+
+    const aVal = (columnIndex === 0 || columnIndex === 3 || columnIndex >= 5)
+      ? extractFirstNumber(aText)
+      : aText;
+
+    const bVal = (columnIndex === 0 || columnIndex === 3 || columnIndex >= 5)
+      ? extractFirstNumber(bText)
+      : bText;
+
+    return isAsc
+      ? (aVal > bVal ? 1 : -1)
+      : (aVal < bVal ? 1 : -1);
   });
+
+  rows.forEach(row => tbody.appendChild(row));
+}
 
   rows.forEach(row => tbody.appendChild(row));
 }
