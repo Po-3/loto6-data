@@ -177,12 +177,16 @@ async function loadData() {
   try {
     const res = await fetch("./loto6.json");
     data = await res.json();
-    
-    // 最新回の日付を取得
-    const latest = data[0]["日付"];  // JSON内の最新の開催回の日付を取得
-    document.getElementById("lastUpdated").innerHTML = `データ更新日：${latest} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.01</a>`;
+
+    // データを開催回の降順で並べ替え
+    data.sort((a, b) => Number(b["開催回"]) - Number(a["開催回"]));
 
     renderTable(data);
+
+    const dates = data.map(item => item["日付"]).sort();
+    const latest = dates[dates.length - 1];
+    document.getElementById("lastUpdated").innerHTML = `データ更新日：${latest} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.01</a>`;
+
   } catch (e) {
     console.error("データ読み込み失敗:", e);
   }
