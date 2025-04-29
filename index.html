@@ -173,20 +173,20 @@ td:first-child, th:first-child {
     return isNaN(intVal) ? value : intVal.toLocaleString() + "円";
   }
 
-  async function loadData() {
-    try {
-      const res = await fetch("./loto6.json");
-      data = await res.json();
-      renderTable(data);
+async function loadData() {
+  try {
+    const res = await fetch("./loto6.json");
+    data = await res.json();
+    
+    // 最新回の日付を取得
+    const latest = data[0]["日付"];  // JSON内の最新の開催回の日付を取得
+    document.getElementById("lastUpdated").innerHTML = `データ更新日：${latest} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.01</a>`;
 
-      const dates = data.map(item => item["日付"]).sort();
-      const latest = dates[dates.length - 1];
-      document.getElementById("lastUpdated").innerHTML = `データ更新日：${latest} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.01</a>`;
-
-    } catch (e) {
-      console.error("データ読み込み失敗:", e);
-    }
+    renderTable(data);
+  } catch (e) {
+    console.error("データ読み込み失敗:", e);
   }
+}
 
   function renderTable(filteredData) {
     const tbody = document.querySelector("#resultTable tbody");
