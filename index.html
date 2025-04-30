@@ -4,6 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <title>ロト6結果検索ツール</title>
 <style>
     body {
@@ -146,7 +147,8 @@ td:first-child, th:first-child {
 <label><input class="feature" type="checkbox" value="キャリーあり"/> キャリーあり</label><span class="info-icon" onclick="showPopup(event, 'キャリーオーバーが発生していた回です。')">ⓘ</span>
 </div>
 <p id="resultCount" style="margin-top: 10px; font-weight: bold;"></p>
-<button onclick="filterResults()" style="background-color: #ff8888; color: white; font-size: 16px; font-weight: bold; font-family: 'Helvetica Neue', sans-serif; border: none; border-radius: 12px; padding: 10px 24px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">🔍 検索</button><button onclick="resetFilters()" style="margin-left: 10px; background-color: #ff8888; color: white; font-size: 16px; font-weight: bold; font-family: 'Helvetica Neue', sans-serif; border: none; border-radius: 12px; padding: 10px 24px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">🔄 リセット</button></div>
+<button onclick="filterResults()" style="background-color: #ff8888; color: white; font-size: 16px; font-weight: bold; font-family: 'Helvetica Neue', sans-serif; border: none; border-radius: 12px; padding: 10px 24px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"><i class="fas fa-magnifying-glass"></i>検索</button>
+<button onclick="resetFilters()" style="margin-left: 10px; background-color: #ff8888; color: white; font-size: 16px; font-weight: bold; font-family: 'Helvetica Neue', sans-serif; border: none; border-radius: 12px; padding: 10px 24px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"><i class="fas fa-rotate-right"></i>リセット</button></div>
 <div class="scroll-container" id="scrollContainer">
 <table id="resultTable">
 <thead>
