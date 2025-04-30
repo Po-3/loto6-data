@@ -311,13 +311,6 @@ function sortTable(columnIndex) {
   const isAsc = !sortDirection[columnIndex];
   sortDirection[columnIndex] = isAsc;
 
-function sortTable(columnIndex) {
-  const table = document.getElementById("resultTable");
-  const tbody = table.querySelector("tbody");
-  const rows = Array.from(tbody.querySelectorAll("tr"));
-  const isAsc = !sortDirection[columnIndex];
-  sortDirection[columnIndex] = isAsc;
-
   // 🔁 この部分（rows.sort(...)）だけを置き換えればOK
   rows.sort((a, b) => {
     const aText = a.children[columnIndex].textContent.trim();
