@@ -140,8 +140,12 @@ td:first-child, th:first-child {
 <label><input class="feature" type="checkbox" value="合計小さめ"/> 合計小さめ</label><span class="info-icon" onclick="showPopup(event, '6つの本数字の合計が114未満の回です。')">ⓘ</span>
 <label><input class="feature" type="checkbox" value="合計大きめ"/> 合計大きめ</label><span class="info-icon" onclick="showPopup(event, '6つの本数字の合計が151を超える回です。')">ⓘ</span>
 <label><input class="feature" type="checkbox" value="キャリーあり"/> キャリーあり</label><span class="info-icon" onclick="showPopup(event, 'キャリーオーバーが発生していた回です。')">ⓘ</span>
-  <label>合計値 From: <input id="fromSum" type="number" min="21" max="255" style="width: 80px;" /></label>
-  <label>To: <input id="toSum" type="number" min="21" max="255" style="width: 80px;" /></label>
+<div style="display: flex; align-items: baseline; gap: 8px;">
+  <span>合計値 From:</span>
+  <input id="fromSum" type="number" min="21" max="255" style="width: 80px;" />
+  <span>To:</span>
+  <input id="toSum" type="number" min="21" max="255" style="width: 80px;" />
+</div>
 <label>構成タイプ:
   <select id="composition" style="margin-left: 4px;">
     <option value="">全て</option>
