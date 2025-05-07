@@ -140,6 +140,20 @@ td:first-child, th:first-child {
 <label><input class="feature" type="checkbox" value="合計小さめ"/> 合計小さめ</label><span class="info-icon" onclick="showPopup(event, '6つの本数字の合計が114未満の回です。')">ⓘ</span>
 <label><input class="feature" type="checkbox" value="合計大きめ"/> 合計大きめ</label><span class="info-icon" onclick="showPopup(event, '6つの本数字の合計が151を超える回です。')">ⓘ</span>
 <label><input class="feature" type="checkbox" value="キャリーあり"/> キャリーあり</label><span class="info-icon" onclick="showPopup(event, 'キャリーオーバーが発生していた回です。')">ⓘ</span>
+<label>合計値 From: <input id="fromSum" type="number" min="21" max="255" style="width: 80px;" /></label>
+<label>To: <input id="toSum" type="number" min="21" max="255" style="width: 80px;" /></label>
+<label>構成タイプ:
+  <select id="composition" style="margin-left: 4px;">
+    <option value="">全て</option>
+    <option value="odd5">奇数5・偶数1</option>
+    <option value="odd4">奇数4・偶数2</option>
+    <option value="odd3">奇数3・偶数3</option>
+    <option value="odd2">奇数2・偶数4</option>
+    <option value="odd1">奇数1・偶数5</option>
+    <option value="even6">偶数6</option>
+    <option value="odd6">奇数6</option>
+  </select>
+</label>
 </div>
 </div>
 <button onclick="filterResults()">
@@ -228,18 +242,39 @@ async function loadData() {
     const fromDate = document.getElementById("fromDate").value;
     const toDate = document.getElementById("toDate").value;
     const checked = Array.from(document.querySelectorAll(".feature:checked")).map(el => el.value);
+const fromSum = parseInt(document.getElementById("fromSum").value) || 21;
+const toSum = parseInt(document.getElementById("toSum").value) || 255;
     const filtered = data.filter(item => {
   const includeNumbers = document.getElementById("includeNumbers").value.split(",").map(s => s.trim()).filter(s => s !== "").map(Number);const excludeNumbers = document.getElementById("excludeNumbers").value.split(",").map(s => s.trim()).filter(s => s !== "").map(Number);const round = parseInt(item["開催回"]);
       const date = item["日付"];
       const inRound = round >= fromRound && round <= toRound;
       const inDate = (!fromDate || date >= fromDate) && (!toDate || date <= toDate);
       const hasFeature = checked.length === 0 || checked.every(f => item["特徴"]?.includes(f));
-      
+
     const nums = [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"], item["第6数字"]].map(n => Number(n));const includeMatch = includeNumbers.length === 0 || includeNumbers.every(n => nums.includes(Number(n)));
+
+const oddCount = nums.filter(n => n % 2 === 1).length;
+const evenCount = 6 - oddCount;
+
+const compType = document.getElementById("composition").value;
+let matchesComposition = true;
+switch (compType) {
+  case "odd6": matchesComposition = (oddCount === 6); break;
+  case "odd5": matchesComposition = (oddCount === 5); break;
+  case "odd4": matchesComposition = (oddCount === 4); break;
+  case "odd3": matchesComposition = (oddCount === 3); break;
+  case "odd2": matchesComposition = (oddCount === 2); break;
+  case "odd1": matchesComposition = (oddCount === 1); break;
+  case "even6": matchesComposition = (evenCount === 6); break;
+}
+
     const excludeMatch = excludeNumbers.length === 0 || excludeNumbers.every(n => !nums.includes(Number(n)));
     if (!includeMatch || !excludeMatch) {}
-    return inRound && inDate && hasFeature && includeMatch && excludeMatch;
     
+const sum = nums.reduce((acc, val) => acc + val, 0);
+const inSum = sum >= fromSum && sum <= toSum;
+return inRound && inDate && hasFeature && includeMatch && excludeMatch && inSum && matchesComposition;
+
     });
     renderTable(filtered);
     document.getElementById("resultCount").textContent = `検索結果：${filtered.length} 件（条件：` +
@@ -284,6 +319,10 @@ async function loadData() {
 
     document.getElementById("resultCount").textContent = "";
     renderTable(data);
+document.getElementById("composition").value = "";
+
+document.getElementById("fromSum").value = "";
+document.getElementById("toSum").value = "";
 
   }
 
