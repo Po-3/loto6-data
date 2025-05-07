@@ -153,27 +153,20 @@ td:first-child, th:first-child {
 </label>
 <span class="info-icon" onclick="showPopup(event, '6つの本数字の合計値で絞り込みます')">ⓘ</span>
 
-<!-- ⭐️合計値入力欄 -->
-  <label>合計値: 
-    <input type="number" id="sumMin" placeholder="最小" style="width:60px;">〜
-    <input type="number" id="sumMax" placeholder="最大" style="width:60px;">
-  </label>
-  <span class="info-icon" onclick="showPopup(event, '6つの本数字の合計値で絞り込みます')">ⓘ</span>
+<label>構成タイプ:
+  <select id="patternType">
+    <option value="">（指定なし）</option>
+    <option value="6-0">奇数6：偶数0</option>
+    <option value="5-1">奇数5：偶数1</option>
+    <option value="4-2">奇数4：偶数2</option>
+    <option value="3-3">奇数3：偶数3</option>
+    <option value="2-4">奇数2：偶数4</option>
+    <option value="1-5">奇数1：偶数5</option>
+    <option value="0-6">奇数0：偶数6</option>
+  </select>
+</label>
+<span class="info-icon" onclick="showPopup(event, '選んだ奇数・偶数の比率に一致する回だけを表示します')">ⓘ</span>
 
-  <!-- ⭐️構成タイプ選択 -->
-  <label>構成タイプ:
-    <select id="patternType">
-      <option value="">（指定なし）</option>
-      <option value="6-0">奇数6：偶数0</option>
-      <option value="5-1">奇数5：偶数1</option>
-      <option value="4-2">奇数4：偶数2</option>
-      <option value="3-3">奇数3：偶数3</option>
-      <option value="2-4">奇数2：偶数4</option>
-      <option value="1-5">奇数1：偶数5</option>
-      <option value="0-6">奇数0：偶数6</option>
-    </select>
-  </label>
-  <span class="info-icon" onclick="showPopup(event, '選んだ奇数・偶数の比率に一致する回だけを表示します')">ⓘ</span>
 
 
 </div>
@@ -218,7 +211,7 @@ async function loadData() {
     const latestDate = new Date(Math.max(...data.map(item => new Date(item["日付"]))));
     const latestDateString = latestDate.toLocaleDateString("ja-JP"); // 日本のローカル日付形式に変換
 
-    document.getElementById("lastUpdated").innerHTML = `データ更新日：${latestDateString} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.11.1</a>`;
+    document.getElementById("lastUpdated").innerHTML = `データ更新日：${latestDateString} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.11.2</a>`;
 
     renderTable(data);
 
@@ -264,15 +257,18 @@ function filterResults() {
   const sumMax = parseInt(document.getElementById("sumMax").value);
   const patternType = document.getElementById("patternType").value;
 
+// ⭐️チェックされた特徴を取得（←これが必要！）
+const checked = Array.from(document.querySelectorAll(".feature:checked")).map(el => el.value);
+
   const filtered = data.filter(item => {
     const round = parseInt(item["開催回"]);
     const date = item["日付"];
-    const nums = [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"], item["第6数字"]].map(n => Number(n));
-    const sum = nums.reduce((a, b) => a + b, 0);
-    const inSum = (!sumMin || sum >= sumMin) && (!sumMax || sum <= sumMax);
-    const oddCount = nums.filter(n => n % 2 === 1).length;
-    const evenCount = 6 - oddCount;
-    const patternMatch = !patternType || patternType === `${oddCount}-${evenCount}`;
+ const nums = [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"], item["第6数字"]].map(n => Number(n));
+const sum = nums.reduce((a, b) => a + b, 0);
+const inSum = (!sumMin || sum >= sumMin) && (!sumMax || sum <= sumMax);
+const oddCount = nums.filter(n => n % 2 === 1).length;
+const evenCount = nums.length - oddCount;
+const patternMatch = !patternType || patternType === `${oddCount}-${evenCount}`;
 
     return (
       round >= fromRound && round <= toRound &&
@@ -296,6 +292,8 @@ function resetFilters() {
   document.getElementById("sumMin").value = "";
   document.getElementById("sumMax").value = "";
   document.getElementById("patternType").value = "";
+  document.querySelectorAll(".feature").forEach(cb => cb.checked = false);
+  document.getElementById("resultCount").textContent = "";
   renderTable(data);
 }
 
@@ -327,24 +325,6 @@ function resetFilters() {
   document.addEventListener("DOMContentLoaded", () => {
     loadData();
   });
-
-  function resetFilters() {
-    document.getElementById("fromRound").value = "";
-    document.getElementById("toRound").value = "";
-    document.getElementById("fromDate").value = "";
-    document.getElementById("toDate").value = "";
-    document.querySelectorAll(".feature").forEach(cb => cb.checked = false);
-  document.getElementById("includeNumbers").value = "";
-  document.getElementById("excludeNumbers").value = "";
-
-    document.getElementById("resultCount").textContent = "";
-    renderTable(data);
-
-      const dates = data.map(item => item["日付"]).sort();
-      const latest = dates[dates.length - 1];
-      document.getElementById("lastUpdated").innerHTML = `データ更新日：${latest} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.01</a>`;
-
-  }
 
 
 document.addEventListener("DOMContentLoaded", () => {
