@@ -272,12 +272,14 @@ const patternMatch = !oddEvenPattern || oddEvenPattern === `${oddCount}-${evenCo
     
 const sum = nums.reduce((acc, val) => acc + val, 0);
 const inSum = sum >= fromSum && sum <= toSum;
-return inRound && inDate && hasFeature && includeMatch && excludeMatch && inSum && matchesComposition;
+return inRound && inDate && hasFeature && includeMatch && excludeMatch && inSum && patternMatch;
 
     });
     renderTable(filtered);
 
-const compText = oddEvenPattern ? `構成：奇数${oddCount}・偶数${evenCount} ` : "";
+const compText = oddEvenPattern
+  ? `構成：奇数${oddEvenPattern.split("-")[0]}・偶数${oddEvenPattern.split("-")[1]} `
+  : "";
 const sumText = (fromSum !== 21 || toSum !== 255) ? `合計値 ${fromSum}〜${toSum} ` : "";
 
 document.getElementById("resultCount").textContent =
