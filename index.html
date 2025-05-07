@@ -259,26 +259,28 @@ function filterResults() {
 
 // ⭐️チェックされた特徴を取得（←これが必要！）
 const checked = Array.from(document.querySelectorAll(".feature:checked")).map(el => el.value);
+const hasFeature = checked.length === 0 || checked.every(f => item["特徴"]?.includes(f));
 
-  const filtered = data.filter(item => {
-    const round = parseInt(item["開催回"]);
-    const date = item["日付"];
- const nums = [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"], item["第6数字"]].map(n => Number(n));
-const sum = nums.reduce((a, b) => a + b, 0);
-const inSum = (!sumMin || sum >= sumMin) && (!sumMax || sum <= sumMax);
-const oddCount = nums.filter(n => n % 2 === 1).length;
-const evenCount = nums.length - oddCount;
-const patternMatch = !patternType || patternType === `${oddCount}-${evenCount}`;
+const filtered = data.filter(item => {
+  const round = parseInt(item["開催回"]);
+  const date = item["日付"];
+  const nums = [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"], item["第6数字"]].map(n => Number(n));
+  const sum = nums.reduce((a, b) => a + b, 0);
+  const inSum = (!sumMin || sum >= sumMin) && (!sumMax || sum <= sumMax);
+  const oddCount = nums.filter(n => n % 2 === 1).length;
+  const evenCount = nums.length - oddCount;
+  const patternMatch = !patternType || patternType === `${oddCount}-${evenCount}`;
 
-    return (
-      round >= fromRound && round <= toRound &&
-      (!fromDate || date >= fromDate) && (!toDate || date <= toDate) &&
-      (includeNumbers.length === 0 || includeNumbers.every(n => nums.includes(n))) &&
-      (excludeNumbers.length === 0 || excludeNumbers.every(n => !nums.includes(n))) &&
-      inSum &&
-      patternMatch
-    );
-  });
+  return (
+    round >= fromRound && round <= toRound &&
+    (!fromDate || date >= fromDate) && (!toDate || date <= toDate) &&
+    (includeNumbers.length === 0 || includeNumbers.every(n => nums.includes(n))) &&
+    (excludeNumbers.length === 0 || excludeNumbers.every(n => !nums.includes(n))) &&
+    inSum &&
+    patternMatch &&
+    hasFeature
+  );
+});
   renderTable(filtered);
 }
 
