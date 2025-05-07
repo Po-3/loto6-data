@@ -237,6 +237,8 @@ async function loadData() {
   }
 
   function filterResults() {
+const compType = document.getElementById("composition").value;
+
     const fromRound = parseInt(document.getElementById("fromRound").value) || 1;
     const toRound = parseInt(document.getElementById("toRound").value) || 9999;
     const fromDate = document.getElementById("fromDate").value;
@@ -256,7 +258,6 @@ const toSum = parseInt(document.getElementById("toSum").value) || 255;
 const oddCount = nums.filter(n => n % 2 === 1).length;
 const evenCount = 6 - oddCount;
 
-const compType = document.getElementById("composition").value;
 let matchesComposition = true;
 switch (compType) {
   case "odd6": matchesComposition = (oddCount === 6); break;
