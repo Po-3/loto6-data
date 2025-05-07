@@ -146,18 +146,17 @@ td:first-child, th:first-child {
   <span>To:</span>
   <input id="toSum" type="number" min="21" max="255" style="width: 80px;" />
 </div>
-<label>奇数・偶数構成:
-  <select id="composition" style="margin-left: 4px;">
-    <option value="">全て</option>
-    <option value="odd5">奇数5・偶数1</option>
-    <option value="odd4">奇数4・偶数2</option>
-    <option value="odd3">奇数3・偶数3</option>
-    <option value="odd2">奇数2・偶数4</option>
-    <option value="odd1">奇数1・偶数5</option>
-    <option value="even6">偶数6</option>
-    <option value="odd6">奇数6</option>
-  </select>
-</label>
+<label for="oddEvenPattern">奇数・偶数構成:</label>
+<select id="oddEvenPattern" style="margin-left: 4px;">
+  <option value="">全件</option>
+  <option value="6-0">奇数6・偶数0</option>
+  <option value="5-1">奇数5・偶数1</option>
+  <option value="4-2">奇数4・偶数2</option>
+  <option value="3-3">奇数3・偶数3</option>
+  <option value="2-4">奇数2・偶数4</option>
+  <option value="1-5">奇数1・偶数5</option>
+  <option value="0-6">奇数0・偶数6</option>
+</select>
 </div>
 </div>
 <button onclick="filterResults()">
@@ -241,7 +240,7 @@ async function loadData() {
   }
 
   function filterResults() {
-const compType = document.getElementById("composition").value;
+const oddEvenPattern = document.getElementById("oddEvenPattern").value;
 
     const fromRound = parseInt(document.getElementById("fromRound").value) || 1;
     const toRound = parseInt(document.getElementById("toRound").value) || 9999;
@@ -266,16 +265,7 @@ const inDate = (!fromDate || formatToDateStr(date) >= fromDate) &&
 const oddCount = nums.filter(n => n % 2 === 1).length;
 const evenCount = 6 - oddCount;
 
-let matchesComposition = true;
-switch (compType) {
-  case "odd6": matchesComposition = (oddCount === 6); break;
-  case "odd5": matchesComposition = (oddCount === 5); break;
-  case "odd4": matchesComposition = (oddCount === 4); break;
-  case "odd3": matchesComposition = (oddCount === 3); break;
-  case "odd2": matchesComposition = (oddCount === 2); break;
-  case "odd1": matchesComposition = (oddCount === 1); break;
-  case "even6": matchesComposition = (evenCount === 6); break;
-}
+const patternMatch = !oddEvenPattern || oddEvenPattern === `${oddCount}-${evenCount}`;
 
     const excludeMatch = excludeNumbers.length === 0 || excludeNumbers.every(n => !nums.includes(Number(n)));
     if (!includeMatch || !excludeMatch) {}
@@ -287,17 +277,7 @@ return inRound && inDate && hasFeature && includeMatch && excludeMatch && inSum 
     });
     renderTable(filtered);
 
-const compLabel = {
-  "odd6": "奇数6・偶数0",
-  "odd5": "奇数5・偶数1",
-  "odd4": "奇数4・偶数2",
-  "odd3": "奇数3・偶数3",
-  "odd2": "奇数2・偶数4",
-  "odd1": "奇数1・偶数5",
-  "even6": "偶数6・奇数0"
-};
-
-const compText = compType ? `構成タイプ：${compLabel[compType]} ` : "";
+const compText = oddEvenPattern ? `構成：奇数${oddCount}・偶数${evenCount} ` : "";
 const sumText = (fromSum !== 21 || toSum !== 255) ? `合計値 ${fromSum}〜${toSum} ` : "";
 
 document.getElementById("resultCount").textContent =
@@ -344,7 +324,7 @@ document.getElementById("resultCount").textContent =
 
     document.getElementById("resultCount").textContent = "";
     renderTable(data);
-document.getElementById("composition").value = "";
+document.getElementById("oddEvenPattern").value = "";
 
 document.getElementById("fromSum").value = "";
 document.getElementById("toSum").value = "";
