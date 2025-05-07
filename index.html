@@ -164,13 +164,14 @@ td:first-child, th:first-child {
 </label>
 <span class="info-icon" onclick="showPopup(event, '選んだ奇数・偶数の比率に一致する回だけを表示します')">ⓘ</span>
 </div>
+<div style="margin: 12px 0; display: flex; gap: 10px;">
+  <button class="filters-button" onclick="filterResults()">
+    <i class="fas fa-magnifying-glass"></i> 検索
+  </button>
+  <button class="filters-button" onclick="resetFilters()">
+    <i class="fas fa-rotate-right"></i> リセット
+  </button>
 </div>
-<button class="filters-button" onclick="filterResults()">
-  <i class="fas fa-magnifying-glass"></i> 検索
-</button>
-<button class="filters-button" onclick="resetFilters()" style="margin-left: 10px;">
-  <i class="fas fa-rotate-right"></i> リセット
-</button>
 <p id="resultCount" style="margin-top: 10px; font-weight: bold;"></p>
 </div>
 <div class="scroll-container" id="scrollContainer">
