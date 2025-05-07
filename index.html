@@ -56,6 +56,20 @@
     padding: 8px 20px;
     cursor: pointer;
   }
+    button {
+    background: #ff8888;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 16px;
+    font-weight: bold;
+    font-family: "Helvetica Neue", sans-serif;
+    cursor: pointer;
+  }
+    button:hover {
+      background-color: #cc6666;
+    }
     #scrollTopBtn { bottom: 70px; }
     #scrollBottomBtn { bottom: 20px; }
     .info-icon {
@@ -89,7 +103,9 @@
     }
   
     
-.filters-button {
+
+
+.filters button {
   background-color: #ff8888;
   color: white;
   font-size: 16px;
@@ -143,35 +159,15 @@ td:first-child, th:first-child {
 <label><input class="feature" type="checkbox" value="合計小さめ"/> 合計小さめ</label><span class="info-icon" onclick="showPopup(event, '6つの本数字の合計が114未満の回です。')">ⓘ</span>
 <label><input class="feature" type="checkbox" value="合計大きめ"/> 合計大きめ</label><span class="info-icon" onclick="showPopup(event, '6つの本数字の合計が151を超える回です。')">ⓘ</span>
 <label><input class="feature" type="checkbox" value="キャリーあり"/> キャリーあり</label><span class="info-icon" onclick="showPopup(event, 'キャリーオーバーが発生していた回です。')">ⓘ</span>
-<label>合計値:
-  <input type="number" id="sumMin" placeholder="最小" style="width:60px;">
-  〜
-  <input type="number" id="sumMax" placeholder="最大" style="width:60px;">
-</label>
-<span class="info-icon" onclick="showPopup(event, '6つの本数字の合計値で絞り込みます')">ⓘ</span>
+</div>
+<</div>
+<button onclick="filterResults()">
+  <i class="fas fa-magnifying-glass"></i> 検索
+</button>
 
-<label>構成タイプ:
-  <select id="patternType">
-    <option value="">（指定なし）</option>
-    <option value="6-0">奇数6：偶数0</option>
-    <option value="5-1">奇数5：偶数1</option>
-    <option value="4-2">奇数4：偶数2</option>
-    <option value="3-3">奇数3：偶数3</option>
-    <option value="2-4">奇数2：偶数4</option>
-    <option value="1-5">奇数1：偶数5</option>
-    <option value="0-6">奇数0：偶数6</option>
-  </select>
-</label>
-<span class="info-icon" onclick="showPopup(event, '選んだ奇数・偶数の比率に一致する回だけを表示します')">ⓘ</span>
-</div>
-<div style="margin: 16px 0; display: flex; gap: 12px;">
-  <button class="filters-button" onclick="filterResults()">
-    <i class="fas fa-magnifying-glass"></i> 検索
-  </button>
-  <button class="filters-button" onclick="resetFilters()">
-    <i class="fas fa-rotate-right"></i> リセット
-  </button>
-</div>
+<button onclick="resetFilters()" style="margin-left: 10px;">
+  <i class="fas fa-rotate-right"></i> リセット
+</button>
 <p id="resultCount" style="margin-top: 10px; font-weight: bold;"></p>
 </div>
 <div class="scroll-container" id="scrollContainer">
@@ -212,7 +208,7 @@ async function loadData() {
     const latestDate = new Date(Math.max(...data.map(item => new Date(item["日付"]))));
     const latestDateString = latestDate.toLocaleDateString("ja-JP"); // 日本のローカル日付形式に変換
 
-    document.getElementById("lastUpdated").innerHTML = `データ更新日：${latestDateString} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.11.3</a>`;
+    document.getElementById("lastUpdated").innerHTML = `データ更新日：${latestDateString} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.11.2</a>`;
 
     renderTable(data);
 
@@ -245,45 +241,31 @@ async function loadData() {
     });
   }
 
-function filterResults() {
-  const fromRound = parseInt(document.getElementById("fromRound").value) || 1;
-  const toRound = parseInt(document.getElementById("toRound").value) || 9999;
-  const fromDate = document.getElementById("fromDate").value;
-  const toDate = document.getElementById("toDate").value;
-  const includeNumbers = document.getElementById("includeNumbers").value.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
-  const excludeNumbers = document.getElementById("excludeNumbers").value.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
-  const sumMin = parseInt(document.getElementById("sumMin")?.value);
-  const sumMax = parseInt(document.getElementById("sumMax")?.value);
-  const patternType = document.getElementById("patternType")?.value;
-  const checked = Array.from(document.querySelectorAll(".feature:checked")).map(el => el.value);
-
-  const filtered = data.filter(item => {
-    const round = parseInt(item["開催回"]);
-    const date = item["日付"];
-    const nums = [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"], item["第6数字"]].map(Number);
-    const sum = nums.reduce((a, b) => a + b, 0);
-    const oddCount = nums.filter(n => n % 2 === 1).length;
-    const evenCount = nums.length - oddCount;
-
-    const inRound = round >= fromRound && round <= toRound;
-    const inDate = (!fromDate || date >= fromDate) && (!toDate || date <= toDate);
-    const includeMatch = includeNumbers.length === 0 || includeNumbers.every(n => nums.includes(n));
-    const excludeMatch = excludeNumbers.length === 0 || excludeNumbers.every(n => !nums.includes(n));
-    const inSum = (!sumMin || sum >= sumMin) && (!sumMax || sum <= sumMax);
-    const patternMatch = !patternType || patternType === `${oddCount}-${evenCount}`;
-    const hasFeature = checked.length === 0 || checked.every(f => item["特徴"]?.includes(f));
-
-    return inRound && inDate && includeMatch && excludeMatch && inSum && patternMatch && hasFeature;
-  });
-
-  renderTable(filtered);
-  document.getElementById("resultCount").textContent = `検索結果：${filtered.length} 件（条件：` +
+  function filterResults() {
+    const fromRound = parseInt(document.getElementById("fromRound").value) || 1;
+    const toRound = parseInt(document.getElementById("toRound").value) || 9999;
+    const fromDate = document.getElementById("fromDate").value;
+    const toDate = document.getElementById("toDate").value;
+    const checked = Array.from(document.querySelectorAll(".feature:checked")).map(el => el.value);
+    const filtered = data.filter(item => {
+  const includeNumbers = document.getElementById("includeNumbers").value.split(",").map(s => s.trim()).filter(s => s !== "").map(Number);const excludeNumbers = document.getElementById("excludeNumbers").value.split(",").map(s => s.trim()).filter(s => s !== "").map(Number);const round = parseInt(item["開催回"]);
+      const date = item["日付"];
+      const inRound = round >= fromRound && round <= toRound;
+      const inDate = (!fromDate || date >= fromDate) && (!toDate || date <= toDate);
+      const hasFeature = checked.length === 0 || checked.every(f => item["特徴"]?.includes(f));
+      
+    const nums = [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"], item["第6数字"]].map(n => Number(n));const includeMatch = includeNumbers.length === 0 || includeNumbers.every(n => nums.includes(Number(n)));
+    const excludeMatch = excludeNumbers.length === 0 || excludeNumbers.every(n => !nums.includes(Number(n)));
+    if (!includeMatch || !excludeMatch) {}
+    return inRound && inDate && hasFeature && includeMatch && excludeMatch;
+    
+    });
+    renderTable(filtered);
+    document.getElementById("resultCount").textContent = `検索結果：${filtered.length} 件（条件：` +
     (fromRound !== 1 || toRound !== 9999 ? `開催回 ${fromRound}〜${toRound} ` : "") +
     (fromDate || toDate ? `開催日 ${fromDate || '未指定'}〜${toDate || '未指定'} ` : "") +
-    (sumMin || sumMax ? `合計値 ${sumMin || '未指定'}〜${sumMax || '未指定'} ` : "") +
-    (patternType ? `構成タイプ ${patternType} ` : "") +
     (checked.length ? `特徴：` + checked.join("・") : "全件") + `)`;
-}
+  }
 
   function showPopup(event, text) {
     const popup = document.getElementById("popupBox");
@@ -321,9 +303,6 @@ function filterResults() {
 
     document.getElementById("resultCount").textContent = "";
     renderTable(data);
-document.getElementById("sumMin").value = "";
-document.getElementById("sumMax").value = "";
-document.getElementById("patternType").value = "";
 
   }
 
