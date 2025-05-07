@@ -277,10 +277,26 @@ return inRound && inDate && hasFeature && includeMatch && excludeMatch && inSum 
 
     });
     renderTable(filtered);
-    document.getElementById("resultCount").textContent = `検索結果：${filtered.length} 件（条件：` +
-    (fromRound !== 1 || toRound !== 9999 ? `開催回 ${fromRound}〜${toRound} ` : "") +
-    (fromDate || toDate ? `開催日 ${fromDate || '未指定'}〜${toDate || '未指定'} ` : "") +
-    (checked.length ? `特徴：` + checked.join("・") : "全件") + `)`;
+
+const compLabel = {
+  "odd6": "奇数6・偶数0",
+  "odd5": "奇数5・偶数1",
+  "odd4": "奇数4・偶数2",
+  "odd3": "奇数3・偶数3",
+  "odd2": "奇数2・偶数4",
+  "odd1": "奇数1・偶数5",
+  "even6": "偶数6・奇数0"
+};
+
+const compText = compType ? `構成タイプ：${compLabel[compType]} ` : "";
+const sumText = (fromSum !== 21 || toSum !== 255) ? `合計値 ${fromSum}〜${toSum} ` : "";
+
+document.getElementById("resultCount").textContent =
+  `検索結果：${filtered.length} 件（条件：` +
+  (fromRound !== 1 || toRound !== 9999 ? `開催回 ${fromRound}〜${toRound} ` : "") +
+  (fromDate || toDate ? `開催日 ${fromDate || '未指定'}〜${toDate || '未指定'} ` : "") +
+  sumText + compText +
+  (checked.length ? `特徴：` + checked.join("・") : "全件") + `)`;
   }
 
   function showPopup(event, text) {
