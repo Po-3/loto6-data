@@ -248,6 +248,12 @@ async function loadData() {
     });
   }
 
+function calculateStdDev(numbers) {
+  const mean = numbers.reduce((a, b) => a + b, 0) / numbers.length;
+  const variance = numbers.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / numbers.length;
+  return Math.sqrt(variance);
+}
+
   function filterResults() {
 const oddEvenPattern = document.getElementById("oddEvenPattern").value;
 
@@ -258,6 +264,8 @@ const oddEvenPattern = document.getElementById("oddEvenPattern").value;
     const checked = Array.from(document.querySelectorAll(".feature:checked")).map(el => el.value);
 const fromSum = parseInt(document.getElementById("fromSum").value) || 21;
 const toSum = parseInt(document.getElementById("toSum").value) || 255;
+const fromStdDev = parseFloat(document.getElementById("fromStdDev").value) || 0;
+const toStdDev = parseFloat(document.getElementById("toStdDev").value) || 100;
     const filtered = data.filter(item => {
   const includeNumbers = document.getElementById("includeNumbers").value.split(",").map(s => s.trim()).filter(s => s !== "").map(Number);const excludeNumbers = document.getElementById("excludeNumbers").value.split(",").map(s => s.trim()).filter(s => s !== "").map(Number);const round = parseInt(item["開催回"]);
       const date = item["日付"];
@@ -274,6 +282,9 @@ const inDate = (!fromDate || formatToDateStr(date) >= fromDate) &&
 const oddCount = nums.filter(n => n % 2 === 1).length;
 const evenCount = 6 - oddCount;
 
+const stdDev = calculateStdDev(nums);
+const inStdDev = stdDev >= fromStdDev && stdDev <= toStdDev;
+
 const patternMatch = !oddEvenPattern || oddEvenPattern === `${oddCount}-${evenCount}`;
 
     const excludeMatch = excludeNumbers.length === 0 || excludeNumbers.every(n => !nums.includes(Number(n)));
@@ -281,7 +292,8 @@ const patternMatch = !oddEvenPattern || oddEvenPattern === `${oddCount}-${evenCo
     
 const sum = nums.reduce((acc, val) => acc + val, 0);
 const inSum = sum >= fromSum && sum <= toSum;
-return inRound && inDate && hasFeature && includeMatch && excludeMatch && inSum && patternMatch;
+return inRound && inDate && hasFeature && includeMatch && excludeMatch &&
+       inSum && patternMatch && inStdDev;
 
     });
     renderTable(filtered);
@@ -290,6 +302,7 @@ const compText = oddEvenPattern
   ? `構成：奇数${oddEvenPattern.split("-")[0]}・偶数${oddEvenPattern.split("-")[1]} `
   : "";
 const sumText = (fromSum !== 21 || toSum !== 255) ? `合計値 ${fromSum}〜${toSum} ` : "";
+const stdDevText = (fromStdDev !== 0 || toStdDev !== 100) ? `標準偏差 ${fromStdDev}〜${toStdDev} ` : "";
 
 document.getElementById("resultCount").textContent =
   `検索結果：${filtered.length} 件（条件：` +
