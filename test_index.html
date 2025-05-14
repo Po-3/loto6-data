@@ -148,19 +148,6 @@ td:first-child, th:first-child {
 <label>To:<input id="toSum" type="number" min="21" max="243" style="width: 80px;" /></label>
 </div>
 <label for="oddEvenPattern">奇数・偶数構成:</label>
-
-<div id="numberStats" style="margin-top:12px;">
-  <strong>📊 出現傾向（<span id="rangeLabel">直近50回</span>）</strong><br/>
-  <div class="stats-buttons" style="margin-top: 6px;">
-    <button onclick="changeStatsRange('all')">全期間</button>
-    <button onclick="changeStatsRange('50')">直近50回</button>
-    <button onclick="changeStatsRange('20')">直近20回</button>
-  </div>
-  <div id="frequentNumbers" style="margin-top: 6px; font-size:14px;">📈 よく出る数字：</div>
-  <div id="unseenNumbers" style="margin-top: 6px; font-size:14px;">📉 最近出ていない数字：</div>
-</div>
-
-</label>
 <select id="oddEvenPattern" style="margin-left: 4px;">
   <option value="">全件</option>
   <option value="6-0">奇数6・偶数0</option>
@@ -172,6 +159,18 @@ td:first-child, th:first-child {
   <option value="0-6">奇数0・偶数6</option>
 </select>
 </div>
+
+<div id="numberStats" style="margin-top:12px; font-size:14px;">
+  <strong>📊 出現傾向（<span id="rangeLabel">直近50回</span>）</strong><br/>
+  <div style="margin-top:6px;">
+    <button onclick="changeStatsRange('all')">全期間</button>
+    <button onclick="changeStatsRange('50')">直近50回</button>
+    <button onclick="changeStatsRange('20')">直近20回</button>
+  </div>
+  <div id="frequentNumbers" style="margin-top:6px;">📈 よく出る数字：</div>
+  <div id="unseenNumbers" style="margin-top:6px;">📉 最近出ていない数字：</div>
+</div>
+
 </div>
 <button onclick="filterResults()">
   <i class="fas fa-magnifying-glass"></i> 検索
@@ -200,6 +199,54 @@ td:first-child, th:first-child {
 <div class="popup" id="popupBox"></div>
 <script>
   let data = [];
+let statsRange = 50;
+
+function getFrequentNumbers(data, limit = 50) {
+  const counts = Array(44).fill(0);
+  data.slice(0, limit).forEach(item => {
+    const nums = [item["第1数字"], item["第2数字"], item["第3数字"],
+                  item["第4数字"], item["第5数字"], item["第6数字"]];
+    nums.forEach(n => counts[Number(n)]++);
+  });
+  return counts.map((count, num) => ({ num, count }))
+               .slice(1)
+               .sort((a, b) => b.count - a.count)
+               .slice(0, 10);
+}
+
+function getUnseenNumbers(data) {
+  const lastSeen = Array(44).fill(-1);
+  data.forEach((item, index) => {
+    const nums = [item["第1数字"], item["第2数字"], item["第3数字"],
+                  item["第4数字"], item["第5数字"], item["第6数字"]];
+    nums.forEach(n => lastSeen[Number(n)] = index);
+  });
+  return lastSeen.map((last, num) => ({ num, count: last === -1 ? data.length : last }))
+                 .slice(1)
+                 .sort((a, b) => b.count - a.count)
+                 .slice(0, 10);
+}
+
+function renderStatistics() {
+  const recentData = data.slice(0, statsRange);
+  const topFreq = getFrequentNumbers(recentData);
+  const unseen = getUnseenNumbers(recentData);
+  document.getElementById("frequentNumbers").innerHTML =
+    "📈 よく出る数字：" + topFreq.map(n => `${n.num}（${n.count}回）`).join("　");
+  document.getElementById("unseenNumbers").innerHTML =
+    "📉 最近出ていない数字：" + unseen.map(n => `${n.num}（${n.count}回未出）`).join("　");
+}
+
+function changeStatsRange(range) {
+  if (range === "all") {
+    statsRange = data.length;
+    document.getElementById("rangeLabel").textContent = "全期間";
+  } else {
+    statsRange = parseInt(range);
+    document.getElementById("rangeLabel").textContent = `直近${range}回`;
+  }
+  renderStatistics();
+}
 
   function formatYen(value) {
     if (!value) return "0円";
@@ -220,7 +267,7 @@ async function loadData() {
     const latestDate = new Date(Math.max(...data.map(item => new Date(item["日付"]))));
     const latestDateString = latestDate.toLocaleDateString("ja-JP"); // 日本のローカル日付形式に変換
 
-    document.getElementById("lastUpdated").innerHTML = `データ更新日：${latestDateString} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.11.3</a>`;
+    document.getElementById("lastUpdated").innerHTML = `データ更新日：${latestDateString} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.12.0</a>`;
 
     renderTable(data);
     renderStatistics();
@@ -341,7 +388,6 @@ document.getElementById("resultCount").textContent =
 
     document.getElementById("resultCount").textContent = "";
     renderTable(data);
-    renderStatistics();
 document.getElementById("oddEvenPattern").value = "";
 
 document.getElementById("fromSum").value = "";
@@ -375,57 +421,7 @@ function sortTable(columnIndex) {
 
     const extractFirstNumber = str => {
       const match = str.match(/\d+/);
-      return match
-let statsRange = 50;
-
-function getFrequentNumbers(data, limit = 50) {
-  const counts = Array(44).fill(0);
-  data.slice(0, limit).forEach(item => {
-    const nums = [item["第1数字"], item["第2数字"], item["第3数字"],
-                  item["第4数字"], item["第5数字"], item["第6数字"]];
-    nums.forEach(n => counts[Number(n)]++);
-  });
-  return counts.map((count, num) => ({ num, count }))
-               .slice(1)
-               .sort((a, b) => b.count - a.count)
-               .slice(0, 10);
-}
-
-function getUnseenNumbers(data) {
-  const lastSeen = Array(44).fill(-1);
-  data.forEach((item, index) => {
-    const nums = [item["第1数字"], item["第2数字"], item["第3数字"],
-                  item["第4数字"], item["第5数字"], item["第6数字"]];
-    nums.forEach(n => lastSeen[Number(n)] = index);
-  });
-  return lastSeen.map((last, num) => ({ num, count: last === -1 ? data.length : last }))
-                 .slice(1)
-                 .sort((a, b) => b.count - a.count)
-                 .slice(0, 10);
-}
-
-function renderStatistics() {
-  const recentData = data.slice(0, statsRange);
-  const topFreq = getFrequentNumbers(recentData);
-  const unseen = getUnseenNumbers(recentData);
-  document.getElementById("frequentNumbers").innerHTML =
-    "📈 よく出る数字：" + topFreq.map(n => `${n.num}（${n.count}回）`).join("　");
-  document.getElementById("unseenNumbers").innerHTML =
-    "📉 最近出ていない数字：" + unseen.map(n => `${n.num}（${n.count}回未出）`).join("　");
-}
-
-function changeStatsRange(range) {
-  if (range === "all") {
-    statsRange = data.length;
-    document.getElementById("rangeLabel").textContent = "全期間";
-  } else {
-    statsRange = parseInt(range);
-    document.getElementById("rangeLabel").textContent = `直近${range}回`;
-  }
-  renderStatistics();
-}
-
- ? parseInt(match[0], 10) : 0;
+      return match ? parseInt(match[0], 10) : 0;
     };
 
     const aVal = (columnIndex === 0 || columnIndex === 3 || columnIndex >= 5)
