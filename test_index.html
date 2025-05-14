@@ -201,9 +201,9 @@ td:first-child, th:first-child {
   let data = [];
 let statsRange = 50;
 
-function getFrequentNumbers(data, limit = 50) {
+function getFrequentNumbers(data) {
   const counts = Array(44).fill(0);
-  data.slice(0, limit).forEach(item => {
+  data.forEach(item => {
     const nums = [item["第1数字"], item["第2数字"], item["第3数字"],
                   item["第4数字"], item["第5数字"], item["第6数字"]];
     nums.forEach(n => counts[Number(n)]++);
