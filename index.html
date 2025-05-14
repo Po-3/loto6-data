@@ -320,18 +320,16 @@ function renderStatistics(range = 50) {
 
 document.getElementById("frequentNumbers").innerHTML =
   '📈 出現回数が多い数字：<span class="nowrap-on-pc"><br />' +
-  topFreq.map((n, i) =>
-    `<span><strong>${n.num}</strong><span style="font-weight:normal;">（${n.count}回）</span></span>` +
-    ((i + 1) % 5 === 0 ? "<br />" : "")
-  ).join("") +
+  topFreq.map(n =>
+  `<span><strong>${n.num}</strong><span style="font-weight:normal;">（${n.count}回）</span></span>`
+).join("") +
   "</span>";
 
 document.getElementById("unseenNumbers").innerHTML =
   '📉 出現回数が少ない数字：<span class="nowrap-on-pc"><br />' +
-  leastFreq.map((n, i) =>
-    `<span><strong>${n.num}</strong><span style="font-weight:normal;">（${n.count}回）</span></span>` +
-    ((i + 1) % 5 === 0 ? "<br />" : "")
-  ).join("") +
+  leastFreq.map(n =>
+  `<span><strong>${n.num}</strong><span style="font-weight:normal;">（${n.count}回）</span></span>`
+).join("") +
   "</span>";
 }
 
