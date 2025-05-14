@@ -93,33 +93,43 @@
       box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
       z-index: 999;
     }
-    @media screen and (max-width: 600px) {
-.filters label {
-        display: block;
-        margin-bottom: 8px;
-      }
-      table {
-  font-size: 14px;
-      }
-      td:nth-child(3), td:nth-child(5) { font-size: 14px; }
-      }
-    }
 
+/* スマホ（〜600px）対応：ラベル表示、フォント調整 */
+@media screen and (max-width: 600px) {
+  .filters label {
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  table {
+    font-size: 14px;
+  }
+
+  td:nth-child(3),
+  td:nth-child(5) {
+    font-size: 14px;
+  }
+
+  /* スマホ専用：プルダウン表示ON、グリッド非表示 */
+  .stats-dropdown-mobile {
+    display: block;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+
+  .stats-grid {
+    display: none;
+  }
+}
+
+/* PC／デフォルト：プルダウン非表示 */
 .stats-dropdown-mobile {
   display: none;
   font-size: 14px;
   margin-top: 10px;
 }
 
-@media (max-width: 600px) {
-  .stats-dropdown-mobile {
-    display: block;
-  }
-  .stats-grid {
-    display: none;
-  }
-}
-
+/* タブレット以下（〜768px）対応：特定列の文字サイズ強制 */
 @media screen and (max-width: 768px) {
   td:nth-child(5) {
     font-size: 14px !important;
