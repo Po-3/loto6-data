@@ -159,11 +159,6 @@ td:first-child, th:first-child {
   <option value="0-6">奇数0・偶数6</option>
 </select>
 </div>
-<!-- 奇数・偶数構成: の下に追加 -->
-<div id="numberStats" style="margin-top: 12px; font-size: 14px; color: #333;">
-  <div id="frequentNumbers" style="margin-bottom: 4px;">📈 よく出る数字：</div>
-  <div id="unseenNumbers">📉 最近出ていない数字：</div>
-</div>
 </div>
 <button onclick="filterResults()">
   <i class="fas fa-magnifying-glass"></i> 検索
@@ -215,7 +210,6 @@ async function loadData() {
     document.getElementById("lastUpdated").innerHTML = `データ更新日：${latestDateString} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.11.3</a>`;
 
     renderTable(data);
-renderStatistics();
 
   } catch (e) {
     console.error("データ読み込み失敗:", e);
@@ -391,50 +385,6 @@ function featureQuickSearch(feature) {
     cb.checked = cb.value === feature;
   });
   filterResults();
-}
-
-function getFrequentNumbers(data, limit = 50) {
-  const counts = Array(44).fill(0);
-  data.slice(0, limit).forEach(item => {
-    const nums = [
-      item["第1数字"], item["第2数字"], item["第3数字"],
-      item["第4数字"], item["第5数字"], item["第6数字"]
-    ];
-    nums.forEach(n => counts[Number(n)]++);
-  });
-  return counts
-    .map((count, num) => ({ num, count }))
-    .slice(1)
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 10);
-}
-
-function getUnseenNumbers(data) {
-  const lastSeen = Array(44).fill(-1);
-  data.forEach((item, index) => {
-    const nums = [
-      item["第1数字"], item["第2数字"], item["第3数字"],
-      item["第4数字"], item["第5数字"], item["第6数字"]
-    ];
-    nums.forEach(n => lastSeen[Number(n)] = index);
-  });
-  return lastSeen
-    .map((last, num) => ({ num, count: last === -1 ? data.length : last }))
-    .slice(1)
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 10);
-}
-
-function renderStatistics() {
-  const recentData = data.slice(0, 50);
-  const topFreq = getFrequentNumbers(recentData);
-  const unseen = getUnseenNumbers(recentData);
-
-  const freqHtml = topFreq.map(item => `<span style="margin-right:6px;">${item.num}（${item.count}回）</span>`).join("");
-  const unseenHtml = unseen.map(item => `<span style="margin-right:6px;">${item.num}（${item.count}回未出）</span>`).join("");
-
-  document.getElementById("frequentNumbers").innerHTML = `📈 よく出る数字：${freqHtml}`;
-  document.getElementById("unseenNumbers").innerHTML = `📉 最近出ていない数字：${unseenHtml}`;
 }
 
 </script>
