@@ -111,22 +111,18 @@
   }
 
   /* スマホ専用：プルダウン表示ON、グリッド非表示 */
-  .stats-dropdown-mobile {
-    display: block;
-    font-size: 14px;
-    margin-top: 10px;
-  }
-
-  .stats-grid {
-    display: none;
-  }
-}
-
-/* PC／デフォルト：プルダウン非表示 */
 .stats-dropdown-mobile {
   display: none;
   font-size: 14px;
   margin-top: 10px;
+}
+@media (max-width: 600px) {
+  .stats-dropdown-mobile {
+    display: block;
+  }
+  .stats-grid {
+    display: none;
+  }
 }
 
 /* タブレット以下（〜768px）対応：特定列の文字サイズ強制 */
