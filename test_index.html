@@ -253,7 +253,7 @@ async function loadData() {
 
     renderTable(data);
 
-const recent = data.slice(0, 50); // 直近50回で統一
+const recent = data; // 全期間を対象に変更
 const allNumbers = Array(43).fill(0);
 
 recent.forEach(item => {
