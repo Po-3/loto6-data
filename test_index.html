@@ -214,38 +214,30 @@ function getFrequentNumbers(data) {
                .slice(0, 10);
 }
 
-function getUnseenNumbers(data) {
-  const lastSeen = Array(44).fill(-1); // index: 1〜43 を使用（0は無視）
-
-  data.forEach((item, index) => {
-    const nums = [
-      Number(item["第1数字"]),
-      Number(item["第2数字"]),
-      Number(item["第3数字"]),
-      Number(item["第4数字"]),
-      Number(item["第5数字"]),
-      Number(item["第6数字"])
-    ];
+function getLeastFrequentNumbers(data) {
+  const counts = Array(44).fill(0);
+  data.forEach(item => {
+    const nums = [item["第1数字"], item["第2数字"], item["第3数字"],
+                  item["第4数字"], item["第5数字"], item["第6数字"]];
     nums.forEach(n => {
-      if (!isNaN(n) && n >= 1 && n <= 43) {
-        lastSeen[n] = index;
+      const num = Number(n);
+      if (!isNaN(num) && num >= 1 && num <= 43) {
+        counts[num]++;
       }
     });
   });
 
-  return lastSeen.map((last, num) => ({
-      num,
-      count: last === -1 ? data.length : last
-    }))
-    .slice(1) // index 0 はスキップ（数字0は存在しない）
-    .sort((a, b) => b.count - a.count)
+  return counts
+    .map((count, num) => ({ num, count }))
+    .slice(1) // 数字1～43のみ
+    .sort((a, b) => a.count - b.count) // 出現回数が少ない順に並べる
     .slice(0, 10);
 }
 
 function renderStatistics() {
   const recentData = data.slice(0, statsRange);
   const topFreq = getFrequentNumbers(recentData);
-  const unseen = getUnseenNumbers(recentData);
+  const unseen = getLeastFrequentNumbers(recentData); // ←ここを変更
   document.getElementById("frequentNumbers").innerHTML =
     "📈 よく出る数字：" + topFreq.map(n => `${n.num}（${n.count}回）`).join("　");
   document.getElementById("unseenNumbers").innerHTML =
