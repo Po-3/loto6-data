@@ -204,8 +204,8 @@ td:first-child, th:first-child {
   <select id="unseenSelect"></select>
   <div id="unseenSingleView" style="margin-top:4px;"></div>
 </div>
-  <div id="frequentNumbers" style="margin-top:6px;">📈 よく出る数字：</div>
-  <div id="unseenNumbers" style="margin-top:6px;">📉 最近出ていない数字：</div>
+<div id="frequentNumbers" class="stats-grid" style="margin-top:6px;"></div>
+<div id="unseenNumbers" class="stats-grid" style="margin-top:6px;"></div>
 </div>
 
 </div>
@@ -296,11 +296,13 @@ unseenSelect.onchange = () => {
   unseenView.innerHTML = `${n.num}（${n.count}回出現）`;
 };
 
-document.getElementById("frequentNumbers").innerHTML =
-  "📈 出現回数が多い数字：" + topFreq.map(n => `${n.num}（${n.count}回）`).join("　");
+if (window.innerWidth > 600) {
+  document.getElementById("frequentNumbers").innerHTML =
+    "📈 出現回数が多い数字：" + topFreq.map(n => `${n.num}（${n.count}回）`).join("　");
 
-document.getElementById("unseenNumbers").innerHTML =
-  "📉 出現回数が少ない数字：" + unseen.map(n => `${n.num}（${n.count}回）`).join("　");
+  document.getElementById("unseenNumbers").innerHTML =
+    "📉 出現回数が少ない数字：" + unseen.map(n => `${n.num}（${n.count}回）`).join("　");
+}
 }
 
 function changeStatsRange(range) {
