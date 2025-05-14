@@ -175,11 +175,17 @@ td:first-child, th:first-child {
   <i class="fas fa-rotate-right"></i> リセット
 </button>
 <p id="resultCount" style="margin-top: 10px; font-weight: bold;"></p>
-</div>
 
+<div id="rangeSelector" class="range-buttons" style="margin-top: 8px;">
+  <button type="button" onclick="renderStatistics('all')" style="margin-right: 5px; padding: 5px 10px;">全期間</button>
+  <button type="button" onclick="renderStatistics(100)" style="margin-right: 5px; padding: 5px 10px;">直近100回</button>
+  <button type="button" onclick="renderStatistics(50)" style="margin-right: 5px; padding: 5px 10px;">直近50回</button>
+  <button type="button" onclick="renderStatistics(20)" style="padding: 5px 10px;">直近20回</button>
+</div>
 <div id="frequentNumbers" style="margin-top: 10px; font-weight: bold;"></div>
 <div id="unseenNumbers" style="margin-top: 4px; font-weight: bold;"></div>
 
+</div>
 <div class="scroll-container" id="scrollContainer">
 <table id="resultTable">
 <thead>
@@ -218,7 +224,7 @@ async function loadData() {
     const latestDate = new Date(Math.max(...data.map(item => new Date(item["日付"]))));
     const latestDateString = latestDate.toLocaleDateString("ja-JP"); // 日本のローカル日付形式に変換
 
-    document.getElementById("lastUpdated").innerHTML = `データ更新日：${latestDateString} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.11.3</a>`;
+    document.getElementById("lastUpdated").innerHTML = `データ更新日：${latestDateString} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.12.0</a>`;
 
     renderTable(data);
 
@@ -253,6 +259,36 @@ document.getElementById("unseenNumbers").innerHTML =
   } catch (e) {
     console.error("データ読み込み失敗:", e);
   }
+}
+
+function renderStatistics(range = 50) {
+  const targetData =
+    range === "all" ? data :
+    typeof range === "number" ? data.slice(0, range) : [];
+
+  const allNumbers = Array(43).fill(0);
+
+  targetData.forEach(item => {
+    [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"], item["第6数字"]]
+      .map(Number)
+      .forEach(n => allNumbers[n - 1]++);
+  });
+
+  const topFreq = [...allNumbers.entries()]
+    .map(([i, count]) => ({ num: i + 1, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+
+  const leastFreq = [...allNumbers.entries()]
+    .map(([i, count]) => ({ num: i + 1, count }))
+    .sort((a, b) => a.count - b.count)
+    .slice(0, 10);
+
+  document.getElementById("frequentNumbers").innerHTML =
+    "📈 出現回数が多い数字：" + topFreq.map(n => `${n.num}（${n.count}回）`).join("　");
+
+  document.getElementById("unseenNumbers").innerHTML =
+    "📉 出現回数が少ない数字：" + leastFreq.map(n => `${n.num}（${n.count}回）`).join("　");
 }
 
   function renderTable(filteredData) {
@@ -375,6 +411,8 @@ document.getElementById("toSum").value = "";
 
 document.addEventListener("DOMContentLoaded", () => {
   loadData();
+
+renderStatistics(); // ← これでデフォルトは「直近50回」
 
   const headers = document.querySelectorAll("#resultTable th");
   headers.forEach((header, index) => {
