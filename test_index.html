@@ -239,10 +239,10 @@ function renderStatistics() {
   const topFreq = getFrequentNumbers(recentData);
   const unseen = getLeastFrequentNumbers(recentData); // ←ここを変更
 document.getElementById("frequentNumbers").innerHTML =
-  "📈 出現回数が多い数字：" + topFreq.map(n => `${n.num}（${n.count}回出現）`).join("　");
+  "📈 出現回数が多い数字：" + topFreq.map(n => `${n.num}（${n.count}回）`).join("　");
 
 document.getElementById("unseenNumbers").innerHTML =
-  "📉 出現回数が少ない数字：" + unseen.map(n => `${n.num}（${n.count}回出現）`).join("　");
+  "📉 出現回数が少ない数字：" + unseen.map(n => `${n.num}（${n.count}回）`).join("　");
 }
 
 function changeStatsRange(range) {
