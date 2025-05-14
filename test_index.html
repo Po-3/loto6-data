@@ -121,6 +121,18 @@
   }
 }
 
+/* PCでは <br> を無効にする */
+.nowrap-on-pc br {
+  display: inline;
+}
+
+/* スマホでは普通に改行 */
+@media (min-width: 769px) {
+  .nowrap-on-pc {
+    white-space: nowrap;
+  }
+}
+
 
 td:first-child, th:first-child {
   position: sticky;
@@ -261,18 +273,20 @@ const leastFreq = [...allNumbers.entries()]
 
 // 表示
 document.getElementById("frequentNumbers").innerHTML =
-  "📈 出現回数が多い数字：<br />" +
+  '📈 出現回数が多い数字：<span class="nowrap-on-pc"><br />' +
   topFreq.map((n, i) =>
     `<span><strong>${n.num}</strong><span style="font-weight:normal;">（${n.count}回）</span></span>` +
     ((i + 1) % 5 === 0 ? "<br />" : "")
-  ).join("");
+  ).join("") +
+  "</span>";
 
 document.getElementById("unseenNumbers").innerHTML =
-  "📉 出現回数が少ない数字：<br />" +
+  '📉 出現回数が少ない数字：<span class="nowrap-on-pc"><br />' +
   leastFreq.map((n, i) =>
     `<span><strong>${n.num}</strong><span style="font-weight:normal;">（${n.count}回）</span></span>` +
     ((i + 1) % 5 === 0 ? "<br />" : "")
-  ).join("");
+  ).join("") +
+  "</span>";
 
   } catch (e) {
     console.error("データ読み込み失敗:", e);
