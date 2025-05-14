@@ -238,10 +238,11 @@ function renderStatistics() {
   const recentData = data.slice(0, statsRange);
   const topFreq = getFrequentNumbers(recentData);
   const unseen = getLeastFrequentNumbers(recentData); // ←ここを変更
-  document.getElementById("frequentNumbers").innerHTML =
-    "📈 よく出る数字：" + topFreq.map(n => `${n.num}（${n.count}回）`).join("　");
-  document.getElementById("unseenNumbers").innerHTML =
-    "📉 最近出ていない数字：" + unseen.map(n => `${n.num}（${n.count}回未出）`).join("　");
+document.getElementById("frequentNumbers").innerHTML =
+  "📈 出現回数が多い数字：" + topFreq.map(n => `${n.num}（${n.count}回出現）`).join("　");
+
+document.getElementById("unseenNumbers").innerHTML =
+  "📉 出現回数が少ない数字：" + unseen.map(n => `${n.num}（${n.count}回出現）`).join("　");
 }
 
 function changeStatsRange(range) {
