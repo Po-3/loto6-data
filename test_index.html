@@ -116,11 +116,6 @@
   font-size: 14px;
   margin-top: 10px;
 }
-.stats-grid {
-  display: block;
-}
-
-/* スマホ用切り替え */
 @media (max-width: 600px) {
   .stats-dropdown-mobile {
     display: block;
@@ -199,22 +194,15 @@ td:first-child, th:first-child {
   <div id="frequentSingleView" style="margin-top:4px;"></div>
 </div>
 
-<!-- スマホ用プルダウン表示 -->
-<div class="stats-dropdown-mobile" id="frequentDropdownWrap">
-  <label for="frequentSelect">📈 出現回数が多い数字：</label>
-  <select id="frequentSelect"></select>
-  <div id="frequentSingleView" style="margin-top:4px;"></div>
-</div>
-
+<!-- スマホ専用：出現回数が少ない数字 -->
 <div class="stats-dropdown-mobile" id="unseenDropdownWrap">
   <label for="unseenSelect">📉 出現回数が少ない数字：</label>
   <select id="unseenSelect"></select>
   <div id="unseenSingleView" style="margin-top:4px;"></div>
 </div>
-
-<!-- PC用ランキング（既存のこれにクラス追加） -->
 <div id="frequentNumbers" class="stats-grid" style="margin-top:6px;"></div>
 <div id="unseenNumbers" class="stats-grid" style="margin-top:6px;"></div>
+</div>
 
 </div>
 <button onclick="filterResults()">
@@ -279,6 +267,7 @@ function getLeastFrequentNumbers(data) {
     .slice(0, 10);
 }
 
+
 function renderStatistics() {
   const recentData = data.slice(0, statsRange);
   const topFreq = getFrequentNumbers(recentData);
@@ -286,53 +275,14 @@ function renderStatistics() {
 
   const freqArea = document.getElementById("frequentNumbers");
   const unseenArea = document.getElementById("unseenNumbers");
-  const freqSelect = document.getElementById("frequentSelect");
-  const freqView = document.getElementById("frequentSingleView");
-  const unseenSelect = document.getElementById("unseenSelect");
-  const unseenView = document.getElementById("unseenSingleView");
 
-  // PC：ランキングを表示
   freqArea.innerHTML =
     "📈 出現回数が多い数字：" + topFreq.map(n => `${n.num}（${n.count}回）`).join("　");
+
   unseenArea.innerHTML =
     "📉 出現回数が少ない数字：" + unseen.map(n => `${n.num}（${n.count}回）`).join("　");
-
-  // スマホ：プルダウンを準備（常に生成しておく）
-  freqSelect.innerHTML = topFreq.map((n, i) => `<option value="${i}">${n.num}（${n.count}回出現）</option>`).join("");
-  freqView.innerHTML = `${topFreq[0].num}（${topFreq[0].count}回出現）`;
-  freqSelect.onchange = () => {
-    const n = topFreq[freqSelect.value];
-    freqView.innerHTML = `${n.num}（${n.count}回出現）`;
-  };
-
-  unseenSelect.innerHTML = unseen.map((n, i) => `<option value="${i}">${n.num}（${n.count}回出現）</option>`).join("");
-  unseenView.innerHTML = `${unseen[0].num}（${unseen[0].count}回出現）`;
-  unseenSelect.onchange = () => {
-    const n = unseen[unseenSelect.value];
-    unseenView.innerHTML = `${n.num}（${n.count}回出現）`;
-  };
 }
 
-    freqArea.innerHTML = "";
-    unseenArea.innerHTML = "";
-  } else {
-    // 🖥 PC用：ズラリ表示のみ
-    freqArea.innerHTML =
-      "📈 出現回数が多い数字：" + topFreq.map(n => `${n.num}（${n.count}回）`).join("　");
-
-    unseenArea.innerHTML =
-      "📉 出現回数が少ない数字：" + unseen.map(n => `${n.num}（${n.count}回）`).join("　");
-
-    // PCではプルダウン初期化
-    freqSelect.innerHTML = "";
-    freqView.innerHTML = "";
-    unseenSelect.innerHTML = "";
-    unseenView.innerHTML = "";
-  }
-} freqArea.innerHTML = "";
-  unseenArea.innerHTML = "";
-}
-}
 
 function changeStatsRange(range) {
   if (range === "all") {
