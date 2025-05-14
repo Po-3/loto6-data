@@ -176,15 +176,16 @@ td:first-child, th:first-child {
 </button>
 <p id="resultCount" style="margin-top: 10px; font-weight: bold;"></p>
 
+<div class="filter2">
 <div id="rangeSelector" class="range-buttons" style="margin-top: 8px;">
   <button type="button" onclick="renderStatistics('all')" style="margin-right: 5px; padding: 5px 10px;">全期間</button>
   <button type="button" onclick="renderStatistics(100)" style="margin-right: 5px; padding: 5px 10px;">直近100回</button>
-  <button type="button" onclick="renderStatistics(50)" style="margin-right: 5px; padding: 5px 10px;">直近50回</button>
-  <button type="button" onclick="renderStatistics(20)" style="padding: 5px 10px;">直近20回</button>
+  <button type="button" onclick="renderStatistics(50)" style="margin-right: 5px; padding: 5px 10px;">50回</button>
+  <button type="button" onclick="renderStatistics(20)" style="padding: 5px 10px;">20回</button>
 </div>
 <div id="frequentNumbers" style="margin-top: 10px; font-weight: bold;"></div>
 <div id="unseenNumbers" style="margin-top: 4px; font-weight: bold;"></div>
-
+</div>
 </div>
 <div class="scroll-container" id="scrollContainer">
 <table id="resultTable">
