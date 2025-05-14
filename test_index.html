@@ -93,44 +93,19 @@
       box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
       z-index: 999;
     }
-
-/* スマホ（〜600px）対応：ラベル表示、フォント調整 */
-@media (max-width: 600px) {
-  .filters label {
-    display: block;
-    margin-bottom: 8px;
-  }
-
-  table {
-    font-size: 14px;
-  }
-
-  td:nth-child(3),
-  td:nth-child(5) {
-    font-size: 14px;
-  }
-
-  /* スマホ専用：プルダウン表示ON、グリッド非表示 */
-.stats-dropdown-mobile {
-  display: none;
+    @media screen and (max-width: 600px) {
+.filters label {
+        display: block;
+        margin-bottom: 8px;
+      }
+      table {
   font-size: 14px;
-  margin-top: 10px;
-}
-.stats-grid {
-  display: block;
-}
+      }
+      td:nth-child(3), td:nth-child(5) { font-size: 14px; }
+      }
+    }
 
-/* スマホ用切り替え */
-@media (max-width: 600px) {
-  .stats-dropdown-mobile {
-    display: block;
-  }
-  .stats-grid {
-    display: none;
-  }
-}
 
-/* タブレット以下（〜768px）対応：特定列の文字サイズ強制 */
 @media screen and (max-width: 768px) {
   td:nth-child(5) {
     font-size: 14px !important;
@@ -143,6 +118,13 @@ td:first-child, th:first-child {
   left: 0;
   background: #fff0f0;
   z-index: 3;
+}
+
+#frequentNumbers,
+#unseenNumbers {
+  font-size: 15px;
+  color: #333;
+  line-height: 1.5;
 }
 
 </style>
@@ -184,24 +166,6 @@ td:first-child, th:first-child {
   <option value="0-6">奇数0・偶数6</option>
 </select>
 </div>
-
-<div id="numberStats" style="margin-top:12px; font-size:14px;">
-  <strong>📊 出現傾向（<span id="rangeLabel">直近50回</span>）</strong><br/>
-  <div style="margin-top:6px;">
-    <button onclick="changeStatsRange('all')">全期間</button>
-    <button onclick="changeStatsRange('50')">直近50回</button>
-    <button onclick="changeStatsRange('20')">直近20回</button>
-  </div>
-<div class="stats-dropdown-mobile" id="unseenDropdownWrap">
-  <label for="unseenSelect">📉 出現回数が少ない数字：</label>
-  <select id="unseenSelect"></select>
-  <div id="unseenSingleView" style="margin-top:4px;"></div>
-</div>
-
-<!-- PC用ランキング（既存のこれにクラス追加） -->
-<div id="frequentNumbers" class="stats-grid" style="margin-top:6px;"></div>
-<div id="unseenNumbers" class="stats-grid" style="margin-top:6px;"></div>
-
 </div>
 <button onclick="filterResults()">
   <i class="fas fa-magnifying-glass"></i> 検索
@@ -212,6 +176,10 @@ td:first-child, th:first-child {
 </button>
 <p id="resultCount" style="margin-top: 10px; font-weight: bold;"></p>
 </div>
+
+<div id="frequentNumbers" style="margin-top: 10px; font-weight: bold;"></div>
+<div id="unseenNumbers" style="margin-top: 4px; font-weight: bold;"></div>
+
 <div class="scroll-container" id="scrollContainer">
 <table id="resultTable">
 <thead>
@@ -230,106 +198,6 @@ td:first-child, th:first-child {
 <div class="popup" id="popupBox"></div>
 <script>
   let data = [];
-let statsRange = 50;
-
-function getFrequentNumbers(data) {
-  const counts = Array(44).fill(0);
-  data.forEach(item => {
-    const nums = [item["第1数字"], item["第2数字"], item["第3数字"],
-                  item["第4数字"], item["第5数字"], item["第6数字"]];
-    nums.forEach(n => counts[Number(n)]++);
-  });
-  return counts.map((count, num) => ({ num, count }))
-               .slice(1)
-               .sort((a, b) => b.count - a.count)
-               .slice(0, 10);
-}
-
-function getLeastFrequentNumbers(data) {
-  const counts = Array(44).fill(0);
-  data.forEach(item => {
-    const nums = [item["第1数字"], item["第2数字"], item["第3数字"],
-                  item["第4数字"], item["第5数字"], item["第6数字"]];
-    nums.forEach(n => {
-      const num = Number(n);
-      if (!isNaN(num) && num >= 1 && num <= 43) {
-        counts[num]++;
-      }
-    });
-  });
-
-  return counts
-    .map((count, num) => ({ num, count }))
-    .slice(1) // 数字1～43のみ
-    .sort((a, b) => a.count - b.count) // 出現回数が少ない順に並べる
-    .slice(0, 10);
-}
-
-function renderStatistics() {
-  const recentData = data.slice(0, statsRange);
-  const topFreq = getFrequentNumbers(recentData);
-  const unseen = getLeastFrequentNumbers(recentData);
-
-  const freqArea = document.getElementById("frequentNumbers");
-  const unseenArea = document.getElementById("unseenNumbers");
-  const freqSelect = document.getElementById("frequentSelect");
-  const freqView = document.getElementById("frequentSingleView");
-  const unseenSelect = document.getElementById("unseenSelect");
-  const unseenView = document.getElementById("unseenSingleView");
-
-  // PC：ランキングを表示
-  freqArea.innerHTML =
-    "📈 出現回数が多い数字：" + topFreq.map(n => `${n.num}（${n.count}回）`).join("　");
-  unseenArea.innerHTML =
-    "📉 出現回数が少ない数字：" + unseen.map(n => `${n.num}（${n.count}回）`).join("　");
-
-  // スマホ：プルダウンを準備（常に生成しておく）
-  freqSelect.innerHTML = topFreq.map((n, i) => `<option value="${i}">${n.num}（${n.count}回出現）</option>`).join("");
-  freqView.innerHTML = `${topFreq[0].num}（${topFreq[0].count}回出現）`;
-  freqSelect.onchange = () => {
-    const n = topFreq[freqSelect.value];
-    freqView.innerHTML = `${n.num}（${n.count}回出現）`;
-  };
-
-  unseenSelect.innerHTML = unseen.map((n, i) => `<option value="${i}">${n.num}（${n.count}回出現）</option>`).join("");
-  unseenView.innerHTML = `${unseen[0].num}（${unseen[0].count}回出現）`;
-  unseenSelect.onchange = () => {
-    const n = unseen[unseenSelect.value];
-    unseenView.innerHTML = `${n.num}（${n.count}回出現）`;
-  };
-}
-
-    freqArea.innerHTML = "";
-    unseenArea.innerHTML = "";
-  } else {
-    // 🖥 PC用：ズラリ表示のみ
-    freqArea.innerHTML =
-      "📈 出現回数が多い数字：" + topFreq.map(n => `${n.num}（${n.count}回）`).join("　");
-
-    unseenArea.innerHTML =
-      "📉 出現回数が少ない数字：" + unseen.map(n => `${n.num}（${n.count}回）`).join("　");
-
-    // PCではプルダウン初期化
-    freqSelect.innerHTML = "";
-    freqView.innerHTML = "";
-    unseenSelect.innerHTML = "";
-    unseenView.innerHTML = "";
-  }
-} freqArea.innerHTML = "";
-  unseenArea.innerHTML = "";
-}
-}
-
-function changeStatsRange(range) {
-  if (range === "all") {
-    statsRange = data.length;
-    document.getElementById("rangeLabel").textContent = "全期間";
-  } else {
-    statsRange = parseInt(range);
-    document.getElementById("rangeLabel").textContent = `直近${range}回`;
-  }
-  renderStatistics();
-}
 
   function formatYen(value) {
     if (!value) return "0円";
@@ -350,10 +218,37 @@ async function loadData() {
     const latestDate = new Date(Math.max(...data.map(item => new Date(item["日付"]))));
     const latestDateString = latestDate.toLocaleDateString("ja-JP"); // 日本のローカル日付形式に変換
 
-    document.getElementById("lastUpdated").innerHTML = `データ更新日：${latestDateString} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.12.0</a>`;
+    document.getElementById("lastUpdated").innerHTML = `データ更新日：${latestDateString} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.11.3</a>`;
 
     renderTable(data);
-    renderStatistics();
+
+const recent = data.slice(0, 50); // 直近50回で統一
+const allNumbers = Array(43).fill(0);
+
+recent.forEach(item => {
+  [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"], item["第6数字"]]
+    .map(Number)
+    .forEach(n => allNumbers[n - 1]++);
+});
+
+// 出現回数が多い順（10個）
+const topFreq = [...allNumbers.entries()]
+  .map(([i, count]) => ({ num: i + 1, count }))
+  .sort((a, b) => b.count - a.count)
+  .slice(0, 10);
+
+// 出現回数が少ない順（10個）
+const leastFreq = [...allNumbers.entries()]
+  .map(([i, count]) => ({ num: i + 1, count }))
+  .sort((a, b) => a.count - b.count)
+  .slice(0, 10);
+
+// 表示
+document.getElementById("frequentNumbers").innerHTML =
+  "📈 出現回数が多い数字：" + topFreq.map(n => `${n.num}（${n.count}回）`).join("　");
+
+document.getElementById("unseenNumbers").innerHTML =
+  "📉 出現回数が少ない数字：" + leastFreq.map(n => `${n.num}（${n.count}回）`).join("　");
 
   } catch (e) {
     console.error("データ読み込み失敗:", e);
