@@ -296,12 +296,17 @@ unseenSelect.onchange = () => {
   unseenView.innerHTML = `${n.num}（${n.count}回出現）`;
 };
 
-if (window.innerWidth > 600) {
-  document.getElementById("frequentNumbers").innerHTML =
-    "📈 出現回数が多い数字：" + topFreq.map(n => `${n.num}（${n.count}回）`).join("　");
+const freqArea = document.getElementById("frequentNumbers");
+const unseenArea = document.getElementById("unseenNumbers");
 
-  document.getElementById("unseenNumbers").innerHTML =
+if (window.innerWidth > 600) {
+  freqArea.innerHTML =
+    "📈 出現回数が多い数字：" + topFreq.map(n => `${n.num}（${n.count}回）`).join("　");
+  unseenArea.innerHTML =
     "📉 出現回数が少ない数字：" + unseen.map(n => `${n.num}（${n.count}回）`).join("　");
+} else {
+  freqArea.innerHTML = "";
+  unseenArea.innerHTML = "";
 }
 }
 
