@@ -105,6 +105,20 @@
       }
     }
 
+.stats-dropdown-mobile {
+  display: none;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+@media (max-width: 600px) {
+  .stats-dropdown-mobile {
+    display: block;
+  }
+  .stats-grid {
+    display: none;
+  }
+}
 
 @media screen and (max-width: 768px) {
   td:nth-child(5) {
@@ -167,6 +181,19 @@ td:first-child, th:first-child {
     <button onclick="changeStatsRange('50')">直近50回</button>
     <button onclick="changeStatsRange('20')">直近20回</button>
   </div>
+<!-- スマホ専用：出現回数が多い数字 -->
+<div class="stats-dropdown-mobile" id="frequentDropdownWrap">
+  <label for="frequentSelect">📈 出現回数が多い数字：</label>
+  <select id="frequentSelect"></select>
+  <div id="frequentSingleView" style="margin-top:4px;"></div>
+</div>
+
+<!-- スマホ専用：出現回数が少ない数字 -->
+<div class="stats-dropdown-mobile" id="unseenDropdownWrap">
+  <label for="unseenSelect">📉 出現回数が少ない数字：</label>
+  <select id="unseenSelect"></select>
+  <div id="unseenSingleView" style="margin-top:4px;"></div>
+</div>
   <div id="frequentNumbers" style="margin-top:6px;">📈 よく出る数字：</div>
   <div id="unseenNumbers" style="margin-top:6px;">📉 最近出ていない数字：</div>
 </div>
@@ -238,6 +265,27 @@ function renderStatistics() {
   const recentData = data.slice(0, statsRange);
   const topFreq = getFrequentNumbers(recentData);
   const unseen = getLeastFrequentNumbers(recentData); // ←ここを変更
+
+// 📈 スマホ用プルダウン（出現回数が多い数字）
+const freqSelect = document.getElementById("frequentSelect");
+const freqView = document.getElementById("frequentSingleView");
+freqSelect.innerHTML = topFreq.map((n, i) => `<option value="${i}">${n.num}（${n.count}回出現）</option>`).join("");
+freqView.innerHTML = `${topFreq[0].num}（${topFreq[0].count}回出現）`;
+freqSelect.onchange = () => {
+  const n = topFreq[freqSelect.value];
+  freqView.innerHTML = `${n.num}（${n.count}回出現）`;
+};
+
+// 📉 スマホ用プルダウン（出現回数が少ない数字）
+const unseenSelect = document.getElementById("unseenSelect");
+const unseenView = document.getElementById("unseenSingleView");
+unseenSelect.innerHTML = unseen.map((n, i) => `<option value="${i}">${n.num}（${n.count}回出現）</option>`).join("");
+unseenView.innerHTML = `${unseen[0].num}（${unseen[0].count}回出現）`;
+unseenSelect.onchange = () => {
+  const n = unseen[unseenSelect.value];
+  unseenView.innerHTML = `${n.num}（${n.count}回出現）`;
+};
+
 document.getElementById("frequentNumbers").innerHTML =
   "📈 出現回数が多い数字：" + topFreq.map(n => `${n.num}（${n.count}回）`).join("　");
 
