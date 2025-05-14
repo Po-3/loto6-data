@@ -245,7 +245,7 @@ function getUnseenNumbers(data) {
 function renderStatistics() {
   const recentData = data.slice(0, statsRange);
   const topFreq = getFrequentNumbers(recentData);
-  const unseen = getUnseenNumbers(data); // ← 常に全期間を渡す
+  const unseen = getUnseenNumbers(recentData);
   document.getElementById("frequentNumbers").innerHTML =
     "📈 よく出る数字：" + topFreq.map(n => `${n.num}（${n.count}回）`).join("　");
   document.getElementById("unseenNumbers").innerHTML =
