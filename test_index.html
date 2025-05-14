@@ -121,15 +121,18 @@
   }
 }
 
-/* PCでは <br> を無効にする */
-.nowrap-on-pc br {
-  display: inline;
-}
-
-/* スマホでは普通に改行 */
-@media (min-width: 769px) {
-  .nowrap-on-pc {
+/* PC では強制的に1行で折り返さない */
+@media screen and (min-width: 769px) {
+  #frequentNumbers span,
+  #unseenNumbers span {
+    display: inline-block;
     white-space: nowrap;
+    margin-right: 8px;
+  }
+
+  #frequentNumbers br,
+  #unseenNumbers br {
+    display: none;
   }
 }
 
