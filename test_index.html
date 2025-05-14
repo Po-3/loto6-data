@@ -456,7 +456,7 @@ document.getElementById("toSum").value = "";
 document.addEventListener("DOMContentLoaded", () => {
   loadData();
 
-renderStatistics(); // ← これでデフォルトは「直近50回」
+renderStatistics("all"); // ← 明示的に「全期間」に
 
   const headers = document.querySelectorAll("#resultTable th");
   headers.forEach((header, index) => {
