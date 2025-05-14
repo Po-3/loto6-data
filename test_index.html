@@ -215,16 +215,31 @@ function getFrequentNumbers(data) {
 }
 
 function getUnseenNumbers(data) {
-  const lastSeen = Array(44).fill(-1);
+  const lastSeen = Array(44).fill(-1); // index: 1〜43 を使用（0は無視）
+
   data.forEach((item, index) => {
-    const nums = [item["第1数字"], item["第2数字"], item["第3数字"],
-                  item["第4数字"], item["第5数字"], item["第6数字"]];
-    nums.forEach(n => lastSeen[Number(n)] = index);
+    const nums = [
+      Number(item["第1数字"]),
+      Number(item["第2数字"]),
+      Number(item["第3数字"]),
+      Number(item["第4数字"]),
+      Number(item["第5数字"]),
+      Number(item["第6数字"])
+    ];
+    nums.forEach(n => {
+      if (!isNaN(n) && n >= 1 && n <= 43) {
+        lastSeen[n] = index;
+      }
+    });
   });
-  return lastSeen.map((last, num) => ({ num, count: last === -1 ? data.length : last }))
-                 .slice(1)
-                 .sort((a, b) => b.count - a.count)
-                 .slice(0, 10);
+
+  return lastSeen.map((last, num) => ({
+      num,
+      count: last === -1 ? data.length : last
+    }))
+    .slice(1) // index 0 はスキップ（数字0は存在しない）
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
 }
 
 function renderStatistics() {
