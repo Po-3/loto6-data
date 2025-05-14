@@ -262,11 +262,15 @@ const leastFreq = [...allNumbers.entries()]
 // 表示
 document.getElementById("frequentNumbers").innerHTML =
   "📈 出現回数が多い数字：<br />" +
-  topFreq.map((n, i) => `${n.num}（${n.count}回）${(i + 1) % 5 === 0 ? "<br />" : "　"}`).join("");
+  topFreq.map((n, i) =>
+    `<strong>${n.num}</strong>（${n.count}回）${(i + 1) % 5 === 0 ? "<br />" : ""}`
+  ).join("");
 
 document.getElementById("unseenNumbers").innerHTML =
   "📉 出現回数が少ない数字：<br />" +
-  leastFreq.map((n, i) => `${n.num}（${n.count}回）${(i + 1) % 5 === 0 ? "<br />" : "　"}`).join("");
+  leastFreq.map((n, i) =>
+    `<strong>${n.num}</strong>（${n.count}回）${(i + 1) % 5 === 0 ? "<br />" : ""}`
+  ).join("");
 
   } catch (e) {
     console.error("データ読み込み失敗:", e);
