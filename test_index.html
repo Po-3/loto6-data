@@ -273,8 +273,14 @@ function renderStatistics() {
   const unseen = getLeastFrequentNumbers(recentData); // ←ここを変更
 
 // 📈 スマホ用プルダウン（出現回数が多い数字）
-const freqSelect = document.getElementById("frequentSelect");
-const freqView = document.getElementById("frequentSingleView");
+if (window.innerWidth <= 600) {
+  freqSelect.innerHTML = topFreq.map((n, i) => `<option value="${i}">${n.num}（${n.count}回出現）</option>`).join("");
+  freqView.innerHTML = `${topFreq[0].num}（${topFreq[0].count}回出現）`;
+  freqSelect.onchange = () => {
+    const n = topFreq[freqSelect.value];
+    freqView.innerHTML = `${n.num}（${n.count}回出現）`;
+  };
+}
 freqSelect.innerHTML = topFreq.map((n, i) => `<option value="${i}">${n.num}（${n.count}回出現）</option>`).join("");
 freqView.innerHTML = `${topFreq[0].num}（${topFreq[0].count}回出現）`;
 freqSelect.onchange = () => {
@@ -283,8 +289,14 @@ freqSelect.onchange = () => {
 };
 
 // 📉 スマホ用プルダウン（出現回数が少ない数字）
-const unseenSelect = document.getElementById("unseenSelect");
-const unseenView = document.getElementById("unseenSingleView");
+if (window.innerWidth <= 600) {
+  unseenSelect.innerHTML = unseen.map((n, i) => `<option value="${i}">${n.num}（${n.count}回出現）</option>`).join("");
+  unseenView.innerHTML = `${unseen[0].num}（${unseen[0].count}回出現）`;
+  unseenSelect.onchange = () => {
+    const n = unseen[unseenSelect.value];
+    unseenView.innerHTML = `${n.num}（${n.count}回出現）`;
+  };
+}
 unseenSelect.innerHTML = unseen.map((n, i) => `<option value="${i}">${n.num}（${n.count}回出現）</option>`).join("");
 unseenView.innerHTML = `${unseen[0].num}（${unseen[0].count}回出現）`;
 unseenSelect.onchange = () => {
