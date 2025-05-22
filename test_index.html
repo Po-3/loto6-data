@@ -541,6 +541,56 @@ function featureQuickSearch(feature) {
   filterResults();
 }
 
+function copySearchUrl() {
+  // 各検索条件をURLパラメータとして連結
+  const params = new URLSearchParams();
+  if (fromRound.value) params.append('fromRound', fromRound.value);
+  if (toRound.value) params.append('toRound', toRound.value);
+  if (fromDate.value) params.append('fromDate', fromDate.value);
+  if (toDate.value) params.append('toDate', toDate.value);
+  if (includeNumbers.value) params.append('includeNumbers', includeNumbers.value);
+  if (excludeNumbers.value) params.append('excludeNumbers', excludeNumbers.value);
+  document.querySelectorAll('.feature').forEach(cb => {
+    if (cb.checked) params.append('feature', cb.value);
+  });
+  if (fromSum.value) params.append('fromSum', fromSum.value);
+  if (toSum.value) params.append('toSum', toSum.value);
+  if (oddEvenPattern.value) params.append('oddEvenPattern', oddEvenPattern.value);
+
+  // 現在のURLのパス＋パラメータで生成
+  const url = `${location.origin}${location.pathname}?${params.toString()}`;
+  // クリップボードにコピー
+  navigator.clipboard.writeText(url).then(() => {
+    alert("現在の検索条件URLをコピーしました！");
+  });
+}
+
+function downloadCSV() {
+  const table = document.getElementById('resultTable');
+  let csv = '';
+  // ヘッダー
+  const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.replace(/ 🔽/g, ''));
+  csv += headers.join(',') + '\r\n';
+  // データ
+  const rows = Array.from(table.querySelectorAll('tbody tr'));
+  rows.forEach(row => {
+    const cols = Array.from(row.children).map(td => {
+      // 「,」や改行を含む場合はダブルクォートで囲む
+      const text = td.textContent.replace(/\r?\n|\r/g, '').replace(/"/g, '""');
+      return /[",\n]/.test(text) ? `"${text}"` : text;
+    });
+    csv += cols.join(',') + '\r\n';
+  });
+  // ダウンロードリンク生成
+  const blob = new Blob([csv], {type: 'text/csv'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'loto6_search_result.csv';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 </script>
   <footer style="margin-top: 40px; text-align: center; font-size: 13px; color: #666;">
     © 2025 <a href="https://www.kujitonari.net/" target="_blank" style="color: #d94f4f; text-decoration: none; font-weight: bold;">tonari</a>. All rights reserved.
