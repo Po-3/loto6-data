@@ -124,8 +124,8 @@
     }
 
 .csv-btn {
-  background: #46b955;
-  color: #fff;
+  background: #46b955 !important;
+  color: #fff !important;
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
@@ -135,8 +135,9 @@
   cursor: pointer;
   transition: background 0.2s;
 }
-.csv-btn:hover {
-  background: #36903d;
+.csv-btn:hover, .csv-btn:focus {
+  background: #36903d !important;
+  color: #fff !important;
 }
 
 @media screen and (max-width: 768px) {
@@ -282,7 +283,7 @@ async function loadData() {
     const latestDate = new Date(Math.max(...data.map(item => new Date(item["日付"]))));
     const latestDateString = latestDate.toLocaleDateString("ja-JP"); // 日本のローカル日付形式に変換
 
-    document.getElementById("lastUpdated").innerHTML = `データ更新日：${latestDateString} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.12.1</a>`;
+    document.getElementById("lastUpdated").innerHTML = `データ更新日：${latestDateString} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.13.0</a>`;
 
     renderTable(data);
 
