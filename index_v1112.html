@@ -4,6 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <title>ロト6結果検索ツール</title>
 <style>
     body {
@@ -55,6 +56,20 @@
     padding: 8px 20px;
     cursor: pointer;
   }
+    button {
+    background: #ff8888;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 16px;
+    font-weight: bold;
+    font-family: "Helvetica Neue", sans-serif;
+    cursor: pointer;
+  }
+    button:hover {
+      background-color: #cc6666;
+    }
     #scrollTopBtn { bottom: 70px; }
     #scrollBottomBtn { bottom: 20px; }
     .info-icon {
@@ -135,8 +150,6 @@ td:first-child, th:first-child {
 <label>開催回 From: <input id="fromRound" min="1" type="number"/></label>
 <label>To: <input id="toRound" min="1" type="number"/></label>
 <label>開催日 From: <input id="fromDate" type="date"/></label>
-
-
 <label>To: <input id="toDate" type="date"/></label><label>含む数字: <input id="includeNumbers" placeholder="例: 3,17,28" style="margin-left: 4px;" type="text"/></label><label>除く数字: <input id="excludeNumbers" placeholder="例: 1,12" style="margin-left: 4px;" type="text"/></label>
 <div style="display: flex; flex-wrap: wrap; gap: 8px;">
 <label><input class="feature" type="checkbox" value="連番あり"/> 連番あり</label><span class="info-icon" onclick="showPopup(event, '連続した数字（例：24・25など）を含む構成です。')">ⓘ</span>
@@ -147,16 +160,24 @@ td:first-child, th:first-child {
 <label><input class="feature" type="checkbox" value="合計大きめ"/> 合計大きめ</label><span class="info-icon" onclick="showPopup(event, '6つの本数字の合計が151を超える回です。')">ⓘ</span>
 <label><input class="feature" type="checkbox" value="キャリーあり"/> キャリーあり</label><span class="info-icon" onclick="showPopup(event, 'キャリーオーバーが発生していた回です。')">ⓘ</span>
 </div>
+</div>
+<button onclick="filterResults()">
+  <i class="fas fa-magnifying-glass"></i> 検索
+</button>
+
+<button onclick="resetFilters()" style="margin-left: 10px;">
+  <i class="fas fa-rotate-right"></i> リセット
+</button>
 <p id="resultCount" style="margin-top: 10px; font-weight: bold;"></p>
-<button onclick="filterResults()" style="background-color: #ff8888; color: white; font-size: 16px; font-weight: bold; font-family: 'Helvetica Neue', sans-serif; border: none; border-radius: 12px; padding: 10px 24px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">🔍 検索</button><button onclick="resetFilters()" style="margin-left: 10px; background-color: #ff8888; color: white; font-size: 16px; font-weight: bold; font-family: 'Helvetica Neue', sans-serif; border: none; border-radius: 12px; padding: 10px 24px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">🔄 リセット</button></div>
+</div>
 <div class="scroll-container" id="scrollContainer">
 <table id="resultTable">
 <thead>
 <tr>
-<th>開催回</th><th>日付</th><th>本数字</th><th>ボーナス</th><th>特徴</th>
-<th>1等賞金</th><th>1等口数</th><th>2等賞金</th><th>2等口数</th>
-<th>3等賞金</th><th>3等口数</th><th>4等賞金</th><th>4等口数</th>
-<th>5等賞金</th><th>5等口数</th><th>キャリーオーバー</th>
+<th style="cursor: pointer;" title="クリックで並び替え">開催回 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">日付 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">本数字 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">ボーナス 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">特徴 🔽</th>
+<th style="cursor: pointer;" title="クリックで並び替え">1等賞金 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">1等口数 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">2等賞金 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">2等口数 🔽</th>
+<th style="cursor: pointer;" title="クリックで並び替え">3等賞金 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">3等口数 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">4等賞金 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">4等口数 🔽</th>
+<th style="cursor: pointer;" title="クリックで並び替え">5等賞金 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">5等口数 🔽</th><th style="cursor: pointer;" title="クリックで並び替え">キャリーオーバー 🔽</th>
 </tr>
 </thead>
 <tbody></tbody>
@@ -175,24 +196,35 @@ td:first-child, th:first-child {
     return isNaN(intVal) ? value : intVal.toLocaleString() + "円";
   }
 
-  async function loadData() {
-    try {
-      const res = await fetch("./loto6.json");
-      data = await res.json();
-      renderTable(data);
+async function loadData() {
+  try {
+    const res = await fetch("./loto6.json");
+    data = await res.json();
 
-      const dates = data.map(item => item["日付"]).sort();
-      const latest = dates[dates.length - 1];
-      document.getElementById("lastUpdated").innerHTML = `データ更新日：${latest} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.11.1</a>`;
+    // データを開催回の降順で並べ替え
+    data.sort((a, b) => Number(b["開催回"]) - Number(a["開催回"]));
 
-    } catch (e) {
-      console.error("データ読み込み失敗:", e);
-    }
+    // 最新のデータ更新日を取得
+    const latestDate = new Date(Math.max(...data.map(item => new Date(item["日付"]))));
+    const latestDateString = latestDate.toLocaleDateString("ja-JP"); // 日本のローカル日付形式に変換
+
+    document.getElementById("lastUpdated").innerHTML = `データ更新日：${latestDateString} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.11.2</a>`;
+
+    renderTable(data);
+
+  } catch (e) {
+    console.error("データ読み込み失敗:", e);
   }
+}
 
   function renderTable(filteredData) {
     const tbody = document.querySelector("#resultTable tbody");
     tbody.innerHTML = "";
+
+// ★ 降順に並べる
+  filteredData.sort((a, b) => Number(b["開催回"]) - Number(a["開催回"]));
+
+
     filteredData.forEach(item => {
       const nums = [item["第1数字"], item["第2数字"], item["第3数字"], item["第4数字"], item["第5数字"], item["第6数字"]].join("・");
       const row = `
@@ -260,10 +292,6 @@ td:first-child, th:first-child {
     container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    loadData();
-  });
-
   function resetFilters() {
     document.getElementById("fromRound").value = "";
     document.getElementById("toRound").value = "";
@@ -276,12 +304,7 @@ td:first-child, th:first-child {
     document.getElementById("resultCount").textContent = "";
     renderTable(data);
 
-      const dates = data.map(item => item["日付"]).sort();
-      const latest = dates[dates.length - 1];
-      document.getElementById("lastUpdated").innerHTML = `データ更新日：${latest} ｜ツールVer：<a href="https://www.kujitonari.net/loto_search_tool" target="_blank" style="color:#d94f4f;text-decoration:underline;">1.11.1</a>`;
-
   }
-
 
 document.addEventListener("DOMContentLoaded", () => {
   loadData();
@@ -302,12 +325,27 @@ function sortTable(columnIndex) {
   const isAsc = !sortDirection[columnIndex];
   sortDirection[columnIndex] = isAsc;
 
+  // 🔁 この部分（rows.sort(...)）だけを置き換えればOK
   rows.sort((a, b) => {
-    const aText = a.children[columnIndex].textContent.trim().replace(/[^\d.-]/g, "");
-    const bText = b.children[columnIndex].textContent.trim().replace(/[^\d.-]/g, "");
-    const aVal = isNaN(aText) ? aText : parseFloat(aText);
-    const bVal = isNaN(bText) ? bText : parseFloat(bText);
-    return isAsc ? (aVal > bVal ? 1 : -1) : (aVal < bVal ? 1 : -1);
+    const aText = a.children[columnIndex].textContent.trim();
+    const bText = b.children[columnIndex].textContent.trim();
+
+    const extractFirstNumber = str => {
+      const match = str.match(/\d+/);
+      return match ? parseInt(match[0], 10) : 0;
+    };
+
+    const aVal = (columnIndex === 0 || columnIndex === 3 || columnIndex >= 5)
+      ? extractFirstNumber(aText)
+      : aText;
+
+    const bVal = (columnIndex === 0 || columnIndex === 3 || columnIndex >= 5)
+      ? extractFirstNumber(bText)
+      : bText;
+
+    return isAsc
+      ? (aVal > bVal ? 1 : -1)
+      : (aVal < bVal ? 1 : -1);
   });
 
   rows.forEach(row => tbody.appendChild(row));
